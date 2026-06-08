@@ -1,10 +1,22 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Home from "./pages/Home";
+import StudentInfo from "./pages/StudentInfo";
+import Curriculum from "./pages/Curriculum";
+import Careers from "./pages/Careers";
+import WebApps from "./pages/WebApps";
+
 function App() {
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex items-center justify-center">
-      <h1 className="text-5xl font-bold">
-        StudentNET
-      </h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/student-info" element={<StudentInfo />} />
+        <Route path="/curriculum" element={<Curriculum />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/web-apps" element={<WebApps />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
