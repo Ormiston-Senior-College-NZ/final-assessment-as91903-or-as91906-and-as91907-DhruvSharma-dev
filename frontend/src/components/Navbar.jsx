@@ -2,62 +2,85 @@ import { Link } from "react-router-dom";
 
 export default function Navbar() {
   return (
-    <div className="px-6 pt-6">
-      <nav className="bg-white rounded-xl shadow-md h-16 flex items-center justify-between px-6">
+    <div className="fixed top-4 left-6 right-6 z-50">
+
+      <nav
+        className="
+          bg-white
+          rounded-xl
+          shadow-md
+          h-14
+          px-6
+          flex
+          items-center
+          justify-between
+        "
+      >
 
         {/* Logo */}
-        <h1 className="text-2xl font-bold text-[#F2901D]">
-          StudentNET
-        </h1>
-
-        {/* Navigation Links */}
-        <div className="flex gap-6 text-gray-700 font-medium">
-
-          <Link
-            to="/"
-            className="hover:text-[#F2901D] transition"
+        <div className="flex items-center gap-3">
+          {/* Placeholder Logo */}
+          <div
+            className="
+              w-10
+              h-10
+              rounded-lg
+              border-2
+              border-dashed
+              border-[#C49A00]
+              flex
+              items-center
+              justify-center
+              text-xs
+              text-gray-500
+            "
           >
-            Home
-          </Link>
+            LOGO
+          </div>
 
-          <Link
-            to="/student-info"
-            className="hover:text-[#F2901D] transition"
-          >
+          <div className="font-bold text-xl text-[#F2901D]">
+            StudentNET
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex gap-8 text-sm font-medium">
+
+          <Link to="/">Home</Link>
+
+          <Link to="/student-info">
             Student Info
           </Link>
 
-          <Link
-            to="/curriculum"
-            className="hover:text-[#F2901D] transition"
-          >
-            Curriculum
+          <Link to="/web-apps">
+            Web Apps
           </Link>
 
-          <Link
-            to="/careers"
-            className="hover:text-[#F2901D] transition"
-          >
+          <Link to="/careers">
             Careers
           </Link>
 
-          <Link
-            to="/web-apps"
-            className="hover:text-[#F2901D] transition"
-          >
-            Web Apps
+          <Link to="/curriculum">
+            Curriculum
           </Link>
 
         </div>
 
-        {/* Search Box */}
+        {/* Search */}
         <input
           type="text"
           placeholder="Search..."
-          className="border rounded-lg px-3 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-[#F2901D]"
+          className="
+            border
+            rounded-md
+            px-3
+            py-1
+            w-56
+          "
         />
 
       </nav>
+
     </div>
   );
 }

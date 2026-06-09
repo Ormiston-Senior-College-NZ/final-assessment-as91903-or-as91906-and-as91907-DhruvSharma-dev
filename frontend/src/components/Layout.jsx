@@ -1,16 +1,18 @@
 import Navbar from "./Navbar";
-import StickyFooter from "./StickyFooter";
+import QuickLinks from "./QuickLinks";
 
 export default function Layout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-400">
+    <div className="min-h-screen bg-[#404040]">
+
       <Navbar />
 
-      <main className="pb-24">
+      <main className="max-w-375 mx-auto px-6 pt-24 pb-24">
         {children}
       </main>
 
-      <StickyFooter />
+      <QuickLinks />
+
     </div>
   );
 }
