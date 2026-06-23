@@ -1,69 +1,92 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import logo from "../assets/osc-logo.png";
 
 export default function Navbar() {
   return (
     <div className="fixed top-4 left-6 right-6 z-50">
-
       <nav
         className="
           bg-white
           rounded-xl
           shadow-md
-          h-14
+          h-16
           px-6
           flex
           items-center
           justify-between
         "
       >
-
         {/* Logo */}
-        <div className="flex items-center gap-3">
-          {/* Placeholder Logo */}
-          <div
-            className="
-              w-10
-              h-10
-              rounded-lg
-              border-2
-              border-dashed
-              border-[#C49A00]
-              flex
-              items-center
-              justify-center
-              text-xs
-              text-gray-500
-            "
-          >
-            LOGO
-          </div>
+        <div className="flex items-center gap-4">
+          <img
+            src={logo}
+            alt="Ormiston Senior College StudentNET Logo"
+            className="h-15 w-auto object-contain"
+          />
 
-          <div className="font-bold text-xl text-[#F2901D]">
-            StudentNET
+          <div>
+            <h1 className="text-xl font-bold text-[#F2901D]">
+              StudentNET
+            </h1>
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex gap-8 text-sm font-medium">
+        <div className="flex items-center gap-8 text-sm font-medium">
+          <NavLink
+            to="/"
+            className={({ isActive }) =>
+              isActive
+                ? "text-[#F2901D] font-semibold"
+                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+            }
+          >
+            Home
+          </NavLink>
 
-          <Link to="/">Home</Link>
-
-          <Link to="/student-info">
+          <NavLink
+            to="/student-info"
+            className={({ isActive }) =>
+              isActive
+                ? "text-[#F2901D] font-semibold"
+                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+            }
+          >
             Student Info
-          </Link>
+          </NavLink>
 
-          <Link to="/web-apps">
-            Web Apps
-          </Link>
-
-          <Link to="/careers">
-            Careers
-          </Link>
-
-          <Link to="/curriculum">
+          <NavLink
+            to="/curriculum"
+            className={({ isActive }) =>
+              isActive
+                ? "text-[#F2901D] font-semibold"
+                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+            }
+          >
             Curriculum
-          </Link>
+          </NavLink>
 
+          <NavLink
+            to="/careers"
+            className={({ isActive }) =>
+              isActive
+                ? "text-[#F2901D] font-semibold"
+                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+            }
+          >
+            Careers
+          </NavLink>
+
+          <NavLink
+            to="/web-apps"
+            className={({ isActive }) =>
+              isActive
+                ? "text-[#F2901D] font-semibold"
+                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+            }
+          >
+            Web Apps
+          </NavLink>
         </div>
 
         {/* Search */}
@@ -71,16 +94,20 @@ export default function Navbar() {
           type="text"
           placeholder="Search..."
           className="
-            border
-            rounded-md
-            px-3
-            py-1
             w-56
+            border
+            border-gray-300
+            rounded-lg
+            px-3
+            py-2
+            text-sm
+            focus:outline-none
+            focus:ring-2
+            focus:ring-[#F2901D]
+            focus:border-[#F2901D]
           "
         />
-
       </nav>
-
     </div>
   );
 }
