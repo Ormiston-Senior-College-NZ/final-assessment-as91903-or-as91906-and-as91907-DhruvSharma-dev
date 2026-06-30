@@ -21,24 +21,20 @@ export default function Navbar() {
           <img
             src={logo}
             alt="Ormiston Senior College StudentNET Logo"
-            className="h-15 w-auto object-contain"
+            className="h-12 w-auto object-contain"
           />
-
-          <div>
-            <h1 className="text-xl font-bold text-[#F2901D]">
-              StudentNET
-            </h1>
-          </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center gap-8 text-sm font-medium">
+        <div className="flex items-center gap-8 text-base font-medium">
           <NavLink
             to="/"
             className={({ isActive }) =>
-              isActive
-                ? "text-[#F2901D] font-semibold"
-                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[#F2901D] text-[#F2901D]"
+                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
+              }`
             }
           >
             Home
@@ -47,9 +43,11 @@ export default function Navbar() {
           <NavLink
             to="/student-info"
             className={({ isActive }) =>
-              isActive
-                ? "text-[#F2901D] font-semibold"
-                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[#F2901D] text-[#F2901D]"
+                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
+              }`
             }
           >
             Student Info
@@ -58,9 +56,11 @@ export default function Navbar() {
           <NavLink
             to="/curriculum"
             className={({ isActive }) =>
-              isActive
-                ? "text-[#F2901D] font-semibold"
-                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[#F2901D] text-[#F2901D]"
+                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
+              }`
             }
           >
             Curriculum
@@ -69,9 +69,11 @@ export default function Navbar() {
           <NavLink
             to="/careers"
             className={({ isActive }) =>
-              isActive
-                ? "text-[#F2901D] font-semibold"
-                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[#F2901D] text-[#F2901D]"
+                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
+              }`
             }
           >
             Careers
@@ -80,9 +82,11 @@ export default function Navbar() {
           <NavLink
             to="/web-apps"
             className={({ isActive }) =>
-              isActive
-                ? "text-[#F2901D] font-semibold"
-                : "text-gray-700 hover:text-[#F2901D] transition-colors"
+              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
+                isActive
+                  ? "border-[#F2901D] text-[#F2901D]"
+                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
+              }`
             }
           >
             Web Apps
