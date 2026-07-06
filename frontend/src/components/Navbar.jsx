@@ -54,7 +54,7 @@ export default function Navbar() {
           </NavLink>
 
           <NavLink
-            to="/curriculum"
+            to="/web-apps"
             className={({ isActive }) =>
               `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
                 isActive
@@ -63,7 +63,7 @@ export default function Navbar() {
               }`
             }
           >
-            Curriculum
+            Web-Based App(s)
           </NavLink>
 
           <NavLink
@@ -80,7 +80,7 @@ export default function Navbar() {
           </NavLink>
 
           <NavLink
-            to="/web-apps"
+            to="/curriculum"
             className={({ isActive }) =>
               `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
                 isActive
@@ -89,7 +89,7 @@ export default function Navbar() {
               }`
             }
           >
-            Web Apps
+            Curriculum
           </NavLink>
         </div>
 

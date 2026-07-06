@@ -1,5 +1,6 @@
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   return (
@@ -42,8 +43,12 @@ export default function Home() {
 
       {/* Teacher Panel */}
       <div className="mt-4">
-        <button
+        <Link
+          to="/teacher-login"
           className="
+            inline-flex
+            items-center
+            justify-center
             bg-[#F2901D]
             text-white
             px-4
@@ -52,7 +57,7 @@ export default function Home() {
           "
         >
           Teacher's Panel
-        </button>
+        </Link>
       </div>
 
     </Layout>
