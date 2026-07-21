@@ -7,7 +7,7 @@ export default function Navbar() {
       <nav
         className="
           mx-auto
-          max-w-[122rem]
+          max-w-488
           bg-white
           rounded-xl
           shadow-md

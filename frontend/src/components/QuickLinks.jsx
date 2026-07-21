@@ -24,7 +24,7 @@ export default function QuickLinks() {
       <div
         className="
           mx-auto
-          max-w-[122rem]
+          max-w-488
           bg-white
           rounded-xl
           shadow-md

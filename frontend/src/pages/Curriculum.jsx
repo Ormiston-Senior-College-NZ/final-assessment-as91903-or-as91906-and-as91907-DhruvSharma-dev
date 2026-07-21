@@ -90,7 +90,7 @@ export default function Curriculum() {
             </div>
           </aside>
 
-          <article className="min-h-[36rem] rounded-lg border border-[#F2901D] bg-white p-5">
+          <article className="min-h-144 rounded-lg border border-[#F2901D] bg-white p-5">
             <h2 className="mb-5 text-xl font-bold text-gray-950">
               More Info:
             </h2>
