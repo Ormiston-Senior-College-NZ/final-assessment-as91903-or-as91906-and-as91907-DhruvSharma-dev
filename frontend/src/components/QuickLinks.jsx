@@ -20,9 +20,11 @@ const quickLinkClass = `
 
 export default function QuickLinks() {
   return (
-    <div className="fixed bottom-4 left-6 right-6 z-50">
+    <div className="fixed bottom-4 left-0 right-0 z-50 px-6">
       <div
         className="
+          mx-auto
+          max-w-[122rem]
           bg-white
           rounded-xl
           shadow-md

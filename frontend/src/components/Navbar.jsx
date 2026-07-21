@@ -3,17 +3,20 @@ import logo from "../assets/osc-logo.png";
 
 export default function Navbar() {
   return (
-    <div className="fixed top-4 left-6 right-6 z-50">
+    <div className="fixed left-0 right-0 top-4 z-50 px-6">
       <nav
         className="
+          mx-auto
+          max-w-[122rem]
           bg-white
           rounded-xl
           shadow-md
-          h-16
+          min-h-16
           px-6
           flex
           items-center
           justify-between
+          gap-6
         "
       >
         {/* Logo */}
@@ -26,7 +29,7 @@ export default function Navbar() {
         </div>
 
         {/* Navigation */}
-        <div className="flex items-center gap-8 text-base font-medium">
+        <div className="flex flex-1 items-center justify-center gap-8 text-base font-medium">
           <NavLink
             to="/"
             className={({ isActive }) =>
@@ -99,6 +102,7 @@ export default function Navbar() {
           placeholder="Search..."
           className="
             w-56
+            shrink-0
             border
             border-gray-300
             rounded-lg

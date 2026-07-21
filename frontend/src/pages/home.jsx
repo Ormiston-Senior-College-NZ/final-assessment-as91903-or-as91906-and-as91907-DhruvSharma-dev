@@ -1,64 +1,103 @@
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
 import { Link } from "react-router-dom";
+import { getStoredWeekItems } from "../data/studentNetData";
 
 export default function Home() {
+  const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
+
+  useEffect(() => {
+    setWeekItems(getStoredWeekItems());
+  }, []);
+
   return (
     <Layout>
+      <section className="space-y-4">
+        {/* Top Row */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
 
-      {/* Top Row */}
-      <div className="grid grid-cols-12 gap-3 mb-3">
+          <DashboardCard
+            title="What's on this week?"
+            className="min-h-64 lg:col-span-3"
+          >
+            <div className="space-y-3">
+              {weekItems.map((item) => (
+                <article
+                  key={item.id}
+                  className="rounded-md border border-[#F2901D]/40 bg-[#fff8ec] px-3 py-2"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-bold text-[#F2901D]">
+                      {item.day}
+                    </p>
+                    <p className="text-xs font-medium text-gray-600">
+                      {item.time}
+                    </p>
+                  </div>
 
-        <DashboardCard
-          title="What's on this week?"
-          className="col-span-3 h-64"
-        />
+                  <h3 className="mt-1 text-sm font-semibold text-gray-950">
+                    {item.title}
+                  </h3>
 
-        <DashboardCard
-          title="2026 Event Calendar"
-          className="col-span-7 h-64"
-        />
+                  <p className="mt-1 text-xs text-gray-600">
+                    {item.location}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </DashboardCard>
 
-        <DashboardCard
-          title="Filter"
-          className="col-span-2 h-64"
-        />
+          <DashboardCard
+            title="2026 Event Calendar"
+            className="min-h-64 lg:col-span-7"
+          />
 
-      </div>
+          <DashboardCard
+            title="Filter"
+            className="min-h-64 lg:col-span-2"
+          />
 
-      {/* Bottom Row */}
-      <div className="grid grid-cols-12 gap-3">
+        </div>
 
-        <DashboardCard
-          title="Map of School"
-          className="col-span-8 h-80"
-        />
+        {/* Bottom Row */}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
 
-        <DashboardCard
-          title="Announcements"
-          className="col-span-4 h-80"
-        />
+          <DashboardCard
+            title="Map of School"
+            className="min-h-96 lg:col-span-8"
+          />
 
-      </div>
+          <DashboardCard
+            title="Announcements"
+            className="min-h-96 lg:col-span-4"
+          />
 
-      {/* Teacher Panel */}
-      <div className="mt-4">
-        <Link
-          to="/teacher-login"
-          className="
-            inline-flex
-            items-center
-            justify-center
-            bg-[#F2901D]
-            text-white
-            px-4
-            py-2
-            rounded-md
-          "
-        >
-          Teacher's Panel
-        </Link>
-      </div>
+        </div>
+
+        {/* Teacher Panel */}
+        <div>
+          <Link
+            to="/teacher-login"
+            className="
+              inline-flex
+              items-center
+              justify-center
+              rounded-md
+              bg-[#F2901D]
+              px-5
+              py-2.5
+              text-sm
+              font-semibold
+              text-white
+              transition
+              hover:bg-[#d87d11]
+            "
+          >
+            Teacher's Panel
+          </Link>
+        </div>
+      </section>
 
     </Layout>
   );
