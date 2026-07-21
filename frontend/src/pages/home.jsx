@@ -1,15 +1,16 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
 import { Link } from "react-router-dom";
-import { getStoredWeekItems } from "../data/studentNetData";
+import {
+  eventCalendarEmbedUrl,
+  eventCalendarViewUrl,
+  getStoredWeekItems,
+} from "../data/studentNetData";
 
 export default function Home() {
-  const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
-
-  useEffect(() => {
-    setWeekItems(getStoredWeekItems());
-  }, []);
+  const [weekItems] = useState(() => getStoredWeekItems());
+  const [calendarFrameKey, setCalendarFrameKey] = useState(0);
 
   return (
     <Layout>
@@ -50,13 +51,54 @@ export default function Home() {
 
           <DashboardCard
             title="2026 Event Calendar"
-            className="min-h-64 lg:col-span-7"
-          />
+            className="min-h-112 lg:col-span-7"
+          >
+            <div className="overflow-hidden rounded-md border border-[#F2901D]/40 bg-white">
+              <iframe
+                key={calendarFrameKey}
+                title="OSC 2026 Event Calendar"
+                src={eventCalendarEmbedUrl}
+                className="h-88 w-full"
+              />
+            </div>
+
+            <a
+              href={eventCalendarViewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex text-sm font-semibold text-[#F2901D] hover:underline"
+            >
+              Open full calendar
+            </a>
+          </DashboardCard>
 
           <DashboardCard
             title="Filter"
-            className="min-h-64 lg:col-span-2"
-          />
+            className="min-h-112 lg:col-span-2"
+          >
+            <div className="space-y-3">
+              <a
+                href={eventCalendarViewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-md border border-[#F2901D] px-3 py-3 text-center text-sm font-semibold text-gray-950 transition hover:bg-[#fff5e9]"
+              >
+                Open Sheet
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setCalendarFrameKey((currentKey) => currentKey + 1)}
+                className="w-full rounded-md border border-[#F2901D] px-3 py-3 text-sm font-semibold text-gray-950 transition hover:bg-[#fff5e9]"
+              >
+                Refresh
+              </button>
+
+              <div className="rounded-md border border-[#F2901D]/40 bg-[#fff8ec] p-3 text-xs leading-5 text-gray-700">
+                OSC Google login required.
+              </div>
+            </div>
+          </DashboardCard>
 
         </div>
 

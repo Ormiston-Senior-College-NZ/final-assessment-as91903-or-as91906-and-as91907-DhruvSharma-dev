@@ -110,6 +110,15 @@ export const defaultWeekItems = [
   },
 ];
 
+export const eventCalendarSheet = {
+  spreadsheetId: "173F-7IVXVgB9K0Cfz_GAPs5iFL6sfYq3Pi0-Ulhq794",
+  gid: "660379046",
+};
+
+export const eventCalendarViewUrl = `https://docs.google.com/spreadsheets/d/${eventCalendarSheet.spreadsheetId}/view?gid=${eventCalendarSheet.gid}`;
+
+export const eventCalendarEmbedUrl = `https://docs.google.com/spreadsheets/d/${eventCalendarSheet.spreadsheetId}/preview?gid=${eventCalendarSheet.gid}`;
+
 const subjectsStorageKey = "studentnet-curriculum-subjects";
 const weekStorageKey = "studentnet-whats-on-this-week";
 
