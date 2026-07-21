@@ -1,6 +1,22 @@
 import { NavLink } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
 
+const navLinkClass = ({ isActive }) =>
+  `
+    rounded-lg
+    px-4
+    py-2.5
+    text-lg
+    font-semibold
+    transition
+    duration-200
+    ${
+      isActive
+        ? "bg-[#F2901D] text-white shadow-sm"
+        : "text-gray-800 hover:bg-[#fff5e9] hover:text-[#F2901D]"
+    }
+  `;
+
 export default function Navbar() {
   return (
     <div className="fixed left-0 right-0 top-4 z-50 px-6">
@@ -29,68 +45,38 @@ export default function Navbar() {
         </div>
 
         {/* Navigation */}
-        <div className="flex flex-1 items-center justify-center gap-8 text-base font-medium">
+        <div className="flex flex-1 items-center justify-center gap-4">
           <NavLink
             to="/"
-            className={({ isActive }) =>
-              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
-                isActive
-                  ? "border-[#F2901D] text-[#F2901D]"
-                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
-              }`
-            }
+            className={navLinkClass}
           >
             Home
           </NavLink>
 
           <NavLink
             to="/student-info"
-            className={({ isActive }) =>
-              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
-                isActive
-                  ? "border-[#F2901D] text-[#F2901D]"
-                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
-              }`
-            }
+            className={navLinkClass}
           >
             Student Info
           </NavLink>
 
           <NavLink
             to="/web-apps"
-            className={({ isActive }) =>
-              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
-                isActive
-                  ? "border-[#F2901D] text-[#F2901D]"
-                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
-              }`
-            }
+            className={navLinkClass}
           >
             Web-Based App(s)
           </NavLink>
 
           <NavLink
             to="/careers"
-            className={({ isActive }) =>
-              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
-                isActive
-                  ? "border-[#F2901D] text-[#F2901D]"
-                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
-              }`
-            }
+            className={navLinkClass}
           >
             Careers
           </NavLink>
 
           <NavLink
             to="/curriculum"
-            className={({ isActive }) =>
-              `px-2 py-1 pb-2 border-b-2 transition-all duration-200 ${
-                isActive
-                  ? "border-[#F2901D] text-[#F2901D]"
-                  : "border-transparent text-gray-700 hover:text-[#F2901D] hover:border-[#F2901D]"
-              }`
-            }
+            className={navLinkClass}
           >
             Curriculum
           </NavLink>
