@@ -4,10 +4,15 @@ import logo from "../assets/osc-logo.png";
 const navLinkClass = ({ isActive }) =>
   `
     rounded-lg
-    px-4
-    py-2.5
-    text-lg
+    px-3
+    py-2
+    text-sm
+    sm:text-base
+    xl:px-4
+    xl:py-2.5
+    xl:text-lg
     font-semibold
+    whitespace-nowrap
     transition
     duration-200
     ${
@@ -19,7 +24,7 @@ const navLinkClass = ({ isActive }) =>
 
 export default function Navbar() {
   return (
-    <div className="fixed left-0 right-0 top-4 z-50 px-6">
+    <div className="fixed left-0 right-0 top-3 z-50 px-3 sm:px-6">
       <nav
         className="
           mx-auto
@@ -28,11 +33,16 @@ export default function Navbar() {
           rounded-xl
           shadow-md
           min-h-16
-          px-6
+          px-3
+          py-3
+          sm:px-6
           flex
+          flex-wrap
           items-center
           justify-between
-          gap-6
+          gap-3
+          xl:flex-nowrap
+          xl:gap-6
         "
       >
         {/* Logo */}
@@ -40,12 +50,12 @@ export default function Navbar() {
           <img
             src={logo}
             alt="Ormiston Senior College StudentNET Logo"
-            className="h-12 w-auto object-contain"
+            className="h-10 w-auto object-contain sm:h-12"
           />
         </div>
 
         {/* Navigation */}
-        <div className="flex flex-1 items-center justify-center gap-4">
+        <div className="order-3 flex w-full items-center gap-2 overflow-x-auto pb-1 sm:gap-3 xl:order-0 xl:w-auto xl:flex-1 xl:justify-center xl:gap-4 xl:overflow-visible xl:pb-0">
           <NavLink
             to="/"
             className={navLinkClass}
@@ -87,7 +97,7 @@ export default function Navbar() {
           type="text"
           placeholder="Search..."
           className="
-            w-56
+            w-40
             shrink-0
             border
             border-gray-300
@@ -99,6 +109,7 @@ export default function Navbar() {
             focus:ring-2
             focus:ring-[#F2901D]
             focus:border-[#F2901D]
+            sm:w-56
           "
         />
       </nav>

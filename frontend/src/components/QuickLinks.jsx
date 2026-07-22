@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const quickLinkClass = `
   flex
   h-11
-  min-w-44
+  min-w-36
   flex-1
   items-center
   justify-center
@@ -11,16 +11,19 @@ const quickLinkClass = `
   border
   border-[#C49A00]
   bg-white
-  px-5
-  text-sm
+  px-3
+  text-xs
   font-medium
   transition
   hover:bg-gray-50
+  sm:min-w-44
+  sm:px-5
+  sm:text-sm
 `;
 
 export default function QuickLinks() {
   return (
-    <div className="fixed bottom-4 left-0 right-0 z-50 px-6">
+    <div className="fixed bottom-3 left-0 right-0 z-50 px-3 sm:bottom-4 sm:px-6">
       <div
         className="
           mx-auto
@@ -30,8 +33,10 @@ export default function QuickLinks() {
           shadow-md
           border
           border-[#C49A00]
-          px-4
-          py-3
+          px-3
+          py-2
+          sm:px-4
+          sm:py-3
         "
       >
         <div className="flex flex-wrap justify-center gap-2">

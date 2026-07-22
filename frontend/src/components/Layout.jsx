@@ -7,7 +7,7 @@ export default function Layout({ children }) {
 
       <Navbar />
 
-      <main className="mx-auto max-w-[110rem] px-6 pt-28 pb-40">
+      <main className="mx-auto max-w-440 px-3 pt-40 pb-52 sm:px-6 xl:pt-28 xl:pb-40">
         {children}
       </main>
 

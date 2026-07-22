@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   createId,
   curriculumLevels,
@@ -8,6 +8,8 @@ import {
   saveStoredSubjects,
   saveStoredWeekItems,
 } from "../data/studentNetData";
+
+const apiBaseUrl = "http://localhost:5000";
 
 const menuSections = [
   {
@@ -102,6 +104,8 @@ function PlaceholderPanel({ title }) {
 }
 
 export default function TeacherPanel() {
+  const navigate = useNavigate();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeEditor, setActiveEditor] = useState("level2");
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
@@ -126,6 +130,43 @@ export default function TeacherPanel() {
     const allMenuItems = menuSections.flatMap((section) => section.items);
     return allMenuItems.find((item) => item.id === activeEditor)?.label || "Editor";
   }, [activeEditor, activeLevel]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function checkTeacherSession() {
+      try {
+        const response = await fetch(`${apiBaseUrl}/api/me`, {
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Not logged in");
+        }
+      } catch {
+        navigate("/teacher-login");
+      } finally {
+        if (isMounted) {
+          setIsCheckingAuth(false);
+        }
+      }
+    }
+
+    checkTeacherSession();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [navigate]);
+
+  async function handleLogout() {
+    await fetch(`${apiBaseUrl}/api/logout`, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    navigate("/teacher-login");
+  }
 
   function updateSubjectForm(field, value) {
     setSubjectForm((currentForm) => ({
@@ -241,6 +282,14 @@ export default function TeacherPanel() {
     clearWeekForm();
   }
 
+  if (isCheckingAuth) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#404040] text-white">
+        Checking teacher access...
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#404040] p-5">
       <section className="grid min-h-[calc(100vh-2.5rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-3 lg:grid-cols-[16rem_1fr]">
@@ -292,12 +341,13 @@ export default function TeacherPanel() {
               </p>
             </div>
 
-            <Link
-              to="/"
+            <button
+              type="button"
+              onClick={handleLogout}
               className="rounded-full border border-[#F2901D] px-8 py-2 text-sm font-semibold text-gray-950 transition hover:bg-[#fff5e9]"
             >
-              Exit
-            </Link>
+              Logout
+            </button>
           </div>
 
           {isSubjectEditor && (
