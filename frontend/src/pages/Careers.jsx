@@ -4,25 +4,25 @@ const careersStaff = [
   {
     name: "Andrea Daly",
     role: "Careers Advisor",
-    photoUrl: "",
+    photoUrl: "/src/assets/Andrea-Daly.jpg",
     bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1Np786GKGkxv8ynyh7kmLC_RW93R36wY1Z3T2xchJETqSVryCrC_QPiDfDFibgnmuVDDC6BkfG",
   },
   {
     name: "Linda Scott",
     role: "Pathways Support",
-    photoUrl: "",
+    photoUrl: "/src/assets/Linda-Scott.jpg",
     bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3VP4cYDCOsgz2zgFZBCP61ImCxV-91ruCD_exaDeHqR27wdygI5b2aPYdWsA7yURaqCt4FY79-",
   },
   {
     name: "Andrew Johnson",
     role: "Gateway Coordinator",
-    photoUrl: "",
+    photoUrl: "/src/assets/Andrew-Johnson.png",
     bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ2A231rGol0l3ku3l23zXPerFWmjySB2Vk91GO2X2MllhneacurBMxb23nAjh12KgyI0CRFosiM",
   },
   {
     name: "Umani Ganegama",
     role: "Careers Support",
-    photoUrl: "",
+    photoUrl: "/src/assets/Umani-Ganegama.png",
     bookingUrl: "https://calendar.google.com/calendar/appointments/schedules/AcZssZ3ug0tQzedkU_TRl9-TZFcLV4vY-6aP0tIVTnx9hZoKLO59k6kOEJvrn6lwrOqkTLs5I6WmmjfE",
   },
 ];

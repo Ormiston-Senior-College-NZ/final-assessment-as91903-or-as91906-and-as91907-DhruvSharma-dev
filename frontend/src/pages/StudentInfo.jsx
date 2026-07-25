@@ -24,7 +24,7 @@ const studentInfoCards = [
   },
   {
     title: "Sports",
-    linkUrl: "",
+    linkUrl: "https://sites.google.com/ormiston.school.nz/oscsports/welcome",
   },
 ];
 
