@@ -7,10 +7,42 @@ import {
   eventCalendarViewUrl,
   getStoredWeekItems,
 } from "../data/studentNetData";
+import mapOne from "../assets/map-1.jpg";
+import mapTwo from "../assets/map-2.jpg";
+import mapThree from "../assets/map-3.jpg";
+
+const schoolMaps = [
+  {
+    title: "Main Building (Ground Floor)",
+    image: mapOne,
+  },
+  {
+    title: "Main Building (Second Floor)",
+    image: mapTwo,
+  },
+  {
+    title: "Ōwhanga and Pūriri Area (on the Field)",
+    image: mapThree,
+  },
+];
 
 export default function Home() {
   const [weekItems] = useState(() => getStoredWeekItems());
   const [calendarFrameKey, setCalendarFrameKey] = useState(0);
+  const [activeMapIndex, setActiveMapIndex] = useState(0);
+  const activeMap = schoolMaps[activeMapIndex];
+
+  function showPreviousMap() {
+    setActiveMapIndex((currentIndex) =>
+      currentIndex === 0 ? schoolMaps.length - 1 : currentIndex - 1,
+    );
+  }
+
+  function showNextMap() {
+    setActiveMapIndex((currentIndex) =>
+      currentIndex === schoolMaps.length - 1 ? 0 : currentIndex + 1,
+    );
+  }
 
   return (
     <Layout>
@@ -108,7 +140,68 @@ export default function Home() {
           <DashboardCard
             title="Map of School"
             className="min-h-96 lg:col-span-8"
-          />
+          >
+            <div className="flex min-h-76 flex-col items-center justify-center rounded-md bg-[#404040] px-4 py-6 text-white">
+              <h3 className="mb-5 text-3xl font-bold">
+                Map of School
+              </h3>
+
+              <div className="grid w-full max-w-4xl grid-cols-[1fr_auto_1fr] items-center gap-3">
+                <img
+                  src={schoolMaps[
+                    activeMapIndex === 0 ? schoolMaps.length - 1 : activeMapIndex - 1
+                  ].image}
+                  alt=""
+                  className="hidden h-36 w-full rounded-md border border-white/20 object-cover opacity-45 sm:block"
+                />
+
+                <div className="relative w-[min(100%,34rem)] overflow-hidden rounded-md border border-[#F2901D] bg-white text-gray-950 shadow-lg">
+                  <div className="mb-3 flex items-center justify-between">
+                    <p className="px-4 pt-3 text-sm font-bold text-[#F2901D]">
+                      {activeMap.title}
+                    </p>
+                    <p className="px-4 pt-3 text-xs font-semibold text-gray-500">
+                      {activeMapIndex + 1}/{schoolMaps.length}
+                    </p>
+                  </div>
+
+                  <img
+                    src={activeMap.image}
+                    alt={`${activeMap.title} school map`}
+                    className="h-56 w-full object-contain px-3 pb-3"
+                  />
+                </div>
+
+                <img
+                  src={schoolMaps[
+                    activeMapIndex === schoolMaps.length - 1 ? 0 : activeMapIndex + 1
+                  ].image}
+                  alt=""
+                  className="hidden h-36 w-full rounded-md border border-white/20 object-cover opacity-45 sm:block"
+                />
+              </div>
+
+              <div className="mt-4 flex gap-4">
+                <button
+                  type="button"
+                  onClick={showPreviousMap}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F2901D] text-2xl font-bold text-black shadow-md"
+                  aria-label="Previous map"
+                >
+                  {"<"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={showNextMap}
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F2901D] text-2xl font-bold text-black shadow-md"
+                  aria-label="Next map"
+                >
+                  {">"}
+                </button>
+              </div>
+            </div>
+          </DashboardCard>
 
           <DashboardCard
             title="Announcements"
