@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 import Layout from "../components/Layout";
 import {
   curriculumLevels,
@@ -7,6 +9,8 @@ import {
 } from "../data/studentNetData";
 
 export default function Curriculum() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
   const [activeLevel, setActiveLevel] = useState("level2");
   const [searchTerm, setSearchTerm] = useState("");
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
@@ -83,7 +87,7 @@ export default function Curriculum() {
                       : "bg-white text-gray-950 hover:bg-[#fff5e9]"
                   }`}
                 >
-                  {subject.name}
+                  <HighlightText text={subject.name} highlight={highlight} />
                 </button>
               ))}
 
@@ -108,12 +112,12 @@ export default function Curriculum() {
                   </p>
 
                   <h3 className="mt-1 text-3xl font-bold text-gray-950">
-                    {selectedSubject.name}
+                    <HighlightText text={selectedSubject.name} highlight={highlight} />
                   </h3>
                 </div>
 
                 <p className="text-lg leading-8 text-gray-700">
-                  {selectedSubject.description}
+                  <HighlightText text={selectedSubject.description} highlight={highlight} />
                 </p>
 
                 <div className="rounded-lg border border-[#F2901D]/40 bg-[#fff8ec] p-4">
@@ -121,7 +125,7 @@ export default function Curriculum() {
                     Pathway
                   </h4>
                   <p className="mt-2 leading-7 text-gray-700">
-                    {selectedSubject.pathway}
+                    <HighlightText text={selectedSubject.pathway} highlight={highlight} />
                   </p>
                 </div>
               </div>

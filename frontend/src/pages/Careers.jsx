@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 import Layout from "../components/Layout";
 import {
   getStoredCareersSupport,
@@ -36,7 +38,7 @@ const careersStaff = [
   },
 ];
 
-function StaffCard({ name, role, photoUrl, bookingUrl }) {
+function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
   const hasBookingLink = Boolean(bookingUrl);
   const hasPhoto = Boolean(photoUrl);
   const CardElement = hasBookingLink ? "a" : "article";
@@ -76,10 +78,10 @@ function StaffCard({ name, role, photoUrl, bookingUrl }) {
 
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-7 pt-24 text-center">
         <p className="text-2xl font-bold uppercase text-gray-950">
-          {name}
+          <HighlightText text={name} highlight={highlight} />
         </p>
         <p className="mt-1 text-sm font-semibold text-gray-800">
-          {role}
+          <HighlightText text={role} highlight={highlight} />
         </p>
       </div>
     </CardElement>
@@ -87,6 +89,8 @@ function StaffCard({ name, role, photoUrl, bookingUrl }) {
 }
 
 export default function Careers() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
   const [careersSupport, setCareersSupport] = useState(() =>
     getStoredCareersSupport(),
   );
@@ -102,6 +106,7 @@ export default function Careers() {
           {careersStaff.map((staffMember) => (
             <StaffCard
               key={staffMember.name}
+              highlight={highlight}
               {...staffMember}
             />
           ))}
@@ -113,11 +118,11 @@ export default function Careers() {
 
         <article className="rounded-lg border border-[#F2901D] bg-white p-6">
           <h1 className="text-2xl font-bold text-gray-950">
-            {careersSupport.title}
+            <HighlightText text={careersSupport.title} highlight={highlight} />
           </h1>
 
           <p className="mt-3 max-w-5xl text-lg leading-8 text-gray-700">
-            {careersSupport.message}
+            <HighlightText text={careersSupport.message} highlight={highlight} />
           </p>
         </article>
       </section>

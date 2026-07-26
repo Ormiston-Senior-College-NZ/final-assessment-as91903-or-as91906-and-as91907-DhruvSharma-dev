@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
 
 const navLinkClass = ({ isActive }) =>
@@ -22,7 +23,55 @@ const navLinkClass = ({ isActive }) =>
     }
   `;
 
+const searchRoutes = [
+  {
+    path: "/careers",
+    keywords: ["career", "careers", "gateway", "university", "apprenticeship"],
+  },
+  {
+    path: "/curriculum",
+    keywords: ["curriculum", "subject", "subjects", "ncea", "level", "pathway", "scholarship", "scholarships"],
+  },
+  {
+    path: "/student-info",
+    keywords: ["student", "gpa", "rank", "score", "sports", "leadership", "doe"],
+  },
+  {
+    path: "/web-apps",
+    keywords: ["web", "apps", "gmail", "classroom", "refseek", "myportfolio"],
+  },
+  {
+    path: "/norms",
+    keywords: ["norm", "norms", "attendance", "uniform", "behaviour", "devices", "exams"],
+  },
+  {
+    path: "/",
+    keywords: ["announcement", "announcements", "map", "calendar", "event", "week"],
+  },
+];
+
 export default function Navbar() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+
+    const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+
+    if (!trimmedSearchTerm) {
+      return;
+    }
+
+    const matchingRoute =
+      searchRoutes.find((route) =>
+        route.keywords.some((keyword) => trimmedSearchTerm.includes(keyword)),
+      ) || searchRoutes[0];
+
+    navigate(`${matchingRoute.path}?highlight=${encodeURIComponent(trimmedSearchTerm)}`);
+    setSearchTerm("");
+  }
+
   return (
     <div className="fixed left-0 right-0 top-3 z-50 px-3 sm:px-6">
       <nav
@@ -94,25 +143,29 @@ export default function Navbar() {
         </div>
 
         {/* Search */}
-        <input
-          type="text"
-          placeholder="Search..."
-          className="
-            w-40
-            shrink-0
-            border
-            border-gray-300
-            rounded-lg
-            px-3
-            py-2
-            text-sm
-            focus:outline-none
-            focus:ring-2
-            focus:ring-[#F2901D]
-            focus:border-[#F2901D]
-            sm:w-56
-          "
-        />
+        <form onSubmit={handleSearchSubmit}>
+          <input
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="Search..."
+            className="
+              w-40
+              shrink-0
+              border
+              border-gray-300
+              rounded-lg
+              px-3
+              py-2
+              text-sm
+              focus:outline-none
+              focus:ring-2
+              focus:ring-[#F2901D]
+              focus:border-[#F2901D]
+              sm:w-56
+            "
+          />
+        </form>
       </nav>
     </div>
   );

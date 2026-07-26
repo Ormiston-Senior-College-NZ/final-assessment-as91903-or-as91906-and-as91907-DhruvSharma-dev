@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 import Layout from "../components/Layout";
 import {
   getStoredStudentInfoLinks,
@@ -75,7 +77,7 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
   );
 }
 
-function CalculatorPanel({ title, calculatorType }) {
+function CalculatorPanel({ title, calculatorType, highlight }) {
   const [creditEntries, setCreditEntries] = useState(startingCreditEntries);
 
   const calculatorResult = useMemo(() => {
@@ -148,7 +150,7 @@ function CalculatorPanel({ title, calculatorType }) {
   return (
     <section className="min-h-136 rounded-lg border border-[#F2901D] bg-white p-6">
       <h1 className="text-2xl font-semibold text-gray-950">
-        {title}
+        <HighlightText text={title} highlight={highlight} />
       </h1>
 
       <div className="mt-18 flex flex-col items-center">
@@ -170,7 +172,7 @@ function CalculatorPanel({ title, calculatorType }) {
   );
 }
 
-function InfoCard({ label, url }) {
+function InfoCard({ label, url, highlight }) {
   const hasLink = Boolean(url);
   const MoreInfoButton = hasLink ? "a" : "button";
 
@@ -191,7 +193,7 @@ function InfoCard({ label, url }) {
       "
     >
       <h2 className="text-xl font-medium text-gray-950">
-        {label}
+        <HighlightText text={label} highlight={highlight} />
       </h2>
 
       <MoreInfoButton
@@ -217,6 +219,8 @@ function InfoCard({ label, url }) {
 }
 
 export default function StudentInfo() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
   const [studentInfoLinks] = useState(() => getStoredStudentInfoLinks());
   const [savedStudentInfoLinks, setSavedStudentInfoLinks] = useState(studentInfoLinks);
 
@@ -231,11 +235,13 @@ export default function StudentInfo() {
           <CalculatorPanel
             title="GPA Calculator"
             calculatorType="gpa"
+            highlight={highlight}
           />
 
           <CalculatorPanel
             title="Rank Score Calculator"
             calculatorType="rankScore"
+            highlight={highlight}
           />
         </div>
 
@@ -243,6 +249,7 @@ export default function StudentInfo() {
           {savedStudentInfoLinks.map((card) => (
             <InfoCard
               key={card.id}
+              highlight={highlight}
               {...card}
             />
           ))}

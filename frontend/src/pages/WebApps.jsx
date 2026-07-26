@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 import Layout from "../components/Layout";
 import { getStoredWebAppLinks, loadStoredWebAppLinks } from "../data/studentNetData";
 
@@ -11,7 +13,7 @@ function getLogoUrl(url) {
   }
 }
 
-function WebAppCard({ label, url }) {
+function WebAppCard({ label, url, highlight }) {
   const logoUrl = getLogoUrl(url);
 
   return (
@@ -26,7 +28,7 @@ function WebAppCard({ label, url }) {
 
       <div className="flex items-end justify-between gap-4">
         <h2 className="text-sm font-medium text-gray-950">
-          {label}
+          <HighlightText text={label} highlight={highlight} />
         </h2>
 
         <a
@@ -43,6 +45,8 @@ function WebAppCard({ label, url }) {
 }
 
 export default function WebApps() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
   const [webApps, setWebApps] = useState(() => getStoredWebAppLinks());
 
   useEffect(() => {
@@ -65,6 +69,7 @@ export default function WebApps() {
           {webApps.map((app) => (
             <WebAppCard
               key={app.id}
+              highlight={highlight}
               {...app}
             />
           ))}

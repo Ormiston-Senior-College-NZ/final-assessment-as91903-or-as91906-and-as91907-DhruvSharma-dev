@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 import {
   eventCalendarEmbedUrl,
   eventCalendarViewUrl,
@@ -30,6 +31,8 @@ const schoolMaps = [
 ];
 
 export default function Home() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
   const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
   const [calendarFrameKey, setCalendarFrameKey] = useState(0);
@@ -71,19 +74,19 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-sm font-bold text-[#F2901D]">
-                      {item.day}
+                      <HighlightText text={item.day} highlight={highlight} />
                     </p>
                     <p className="text-xs font-medium text-gray-600">
-                      {item.time}
+                      <HighlightText text={item.time} highlight={highlight} />
                     </p>
                   </div>
 
                   <h3 className="mt-1 text-sm font-semibold text-gray-950">
-                    {item.title}
+                    <HighlightText text={item.title} highlight={highlight} />
                   </h3>
 
                   <p className="mt-1 text-xs text-gray-600">
-                    {item.location}
+                    <HighlightText text={item.location} highlight={highlight} />
                   </p>
                 </article>
               ))}
@@ -224,16 +227,16 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-base font-bold text-gray-950">
-                      {announcement.title}
+                      <HighlightText text={announcement.title} highlight={highlight} />
                     </h3>
 
                     <p className="text-xs font-semibold text-[#F2901D]">
-                      {announcement.date}
+                      <HighlightText text={announcement.date} highlight={highlight} />
                     </p>
                   </div>
 
                   <p className="mt-2 text-sm leading-6 text-gray-700">
-                    {announcement.message}
+                    <HighlightText text={announcement.message} highlight={highlight} />
                   </p>
                 </article>
               ))}

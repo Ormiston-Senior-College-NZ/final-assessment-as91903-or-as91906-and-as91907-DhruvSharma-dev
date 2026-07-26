@@ -1,11 +1,16 @@
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
+import { useSearchParams } from "react-router-dom";
+import HighlightText from "../components/HighlightText";
 
 export default function Norms() {
+  const [searchParams] = useSearchParams();
+  const highlight = searchParams.get("highlight") || "";
+
   return (
     <Layout>
       <h1 className="text-4xl font-bold mb-6">
-        School Norms
+        <HighlightText text="School Norms" highlight={highlight} />
       </h1>
 
       {/* Search Bar */}
@@ -38,27 +43,27 @@ export default function Norms() {
           <div className="space-y-2">
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Attendance
+              <HighlightText text="Attendance" highlight={highlight} />
             </button>
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Uniform
+              <HighlightText text="Uniform" highlight={highlight} />
             </button>
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Behaviour
+              <HighlightText text="Behaviour" highlight={highlight} />
             </button>
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Devices
+              <HighlightText text="Devices" highlight={highlight} />
             </button>
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Exams
+              <HighlightText text="Exams" highlight={highlight} />
             </button>
 
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
-              Safety
+              <HighlightText text="Safety" highlight={highlight} />
             </button>
 
           </div>
@@ -70,13 +75,14 @@ export default function Norms() {
           className="col-span-9"
         >
           <h2 className="text-2xl font-semibold mb-4">
-            Attendance Expectations
+            <HighlightText text="Attendance Expectations" highlight={highlight} />
           </h2>
 
           <p className="leading-7 text-gray-700">
-            School attendance expectations will appear here.
-            Later this content will be loaded from the Flask backend
-            so staff can update the norms without changing the website.
+            <HighlightText
+              text="School attendance expectations will appear here. Later this content will be loaded from the Flask backend so staff can update the norms without changing the website."
+              highlight={highlight}
+            />
           </p>
         </DashboardCard>
 
