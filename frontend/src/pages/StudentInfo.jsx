@@ -1,5 +1,9 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Layout from "../components/Layout";
+import {
+  getStoredStudentInfoLinks,
+  loadStoredStudentInfoLinks,
+} from "../data/studentNetData";
 
 const nceaGradeOptions = [
   { label: "Achieved", value: "achieved", points: 2 },
@@ -11,21 +15,6 @@ const startingCreditEntries = [
   { id: 1, credits: "", grade: "" },
   { id: 2, credits: "", grade: "" },
   { id: 3, credits: "", grade: "" },
-];
-
-const studentInfoCards = [
-  {
-    title: "Student Leadership",
-    linkUrl: "",
-  },
-  {
-    title: "DoE at OSC",
-    linkUrl: "",
-  },
-  {
-    title: "Sports",
-    linkUrl: "https://sites.google.com/ormiston.school.nz/oscsports/welcome",
-  },
 ];
 
 function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
@@ -181,8 +170,8 @@ function CalculatorPanel({ title, calculatorType }) {
   );
 }
 
-function InfoCard({ title, linkUrl }) {
-  const hasLink = Boolean(linkUrl);
+function InfoCard({ label, url }) {
+  const hasLink = Boolean(url);
   const MoreInfoButton = hasLink ? "a" : "button";
 
   return (
@@ -202,11 +191,11 @@ function InfoCard({ title, linkUrl }) {
       "
     >
       <h2 className="text-xl font-medium text-gray-950">
-        {title}
+        {label}
       </h2>
 
       <MoreInfoButton
-        href={hasLink ? linkUrl : undefined}
+        href={hasLink ? url : undefined}
         target={hasLink ? "_blank" : undefined}
         rel={hasLink ? "noopener noreferrer" : undefined}
         type={hasLink ? undefined : "button"}
@@ -228,6 +217,13 @@ function InfoCard({ title, linkUrl }) {
 }
 
 export default function StudentInfo() {
+  const [studentInfoLinks] = useState(() => getStoredStudentInfoLinks());
+  const [savedStudentInfoLinks, setSavedStudentInfoLinks] = useState(studentInfoLinks);
+
+  useEffect(() => {
+    loadStoredStudentInfoLinks().then(setSavedStudentInfoLinks);
+  }, []);
+
   return (
     <Layout>
       <section className="space-y-5">
@@ -244,9 +240,9 @@ export default function StudentInfo() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          {studentInfoCards.map((card) => (
+          {savedStudentInfoLinks.map((card) => (
             <InfoCard
-              key={card.title}
+              key={card.id}
               {...card}
             />
           ))}

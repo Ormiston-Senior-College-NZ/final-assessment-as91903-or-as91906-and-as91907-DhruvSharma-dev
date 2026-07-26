@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getStoredQuickLinks, loadStoredQuickLinks } from "../data/studentNetData";
 
 const quickLinkClass = `
   flex
@@ -22,6 +24,12 @@ const quickLinkClass = `
 `;
 
 export default function QuickLinks() {
+  const [quickLinks, setQuickLinks] = useState(() => getStoredQuickLinks());
+
+  useEffect(() => {
+    loadStoredQuickLinks().then(setQuickLinks);
+  }, []);
+
   return (
     <div className="fixed bottom-3 left-0 right-0 z-50 px-3 sm:bottom-4 sm:px-6">
       <div
@@ -41,51 +49,27 @@ export default function QuickLinks() {
       >
         <div className="flex flex-wrap justify-center gap-2">
 
-          {/* Internal Page */}
-          <Link
-            to="/norms"
-            className={quickLinkClass}
-          >
-            Norms
-          </Link>
-
-          {/* External Links */}
-
-          <a
-            href="https://ormiston.school.kiwi/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={quickLinkClass}
-          >
-            Kamar Portal
-          </a>
-
-          <a
-            href="https://drive.google.com/drive/folders/132RJOXYCqDDaKhRiS3AfWgMS6K676BiE?usp=sharing"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={quickLinkClass}
-          >
-            Wi-Fi Setup
-          </a>
-
-          <a
-            href="https://docs.google.com/spreadsheets/d/1gjfaDCoq37gcznVxVUboHnfdCc43wJjR5Z-bd2BQcgQ/edit?gid=1149952797#gid=1149952797"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={quickLinkClass}
-          >
-            School Clubs
-          </a>
-
-          <a
-            href="https://docs.google.com/spreadsheets/d/1_qqpln-KH4U-Iuwl46oOmiXY58sk4GyxAgSK0MMilKM/edit?gid=105554696#gid=105554696"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={quickLinkClass}
-          >
-            I-Time Tutorials
-          </a>
+          {quickLinks.map((quickLink) =>
+            quickLink.isInternal ? (
+              <Link
+                key={quickLink.id}
+                to={quickLink.url}
+                className={quickLinkClass}
+              >
+                {quickLink.label}
+              </Link>
+            ) : (
+              <a
+                key={quickLink.id}
+                href={quickLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={quickLinkClass}
+              >
+                {quickLink.label}
+              </a>
+            ),
+          )}
 
         </div>
       </div>

@@ -1,47 +1,32 @@
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { getStoredWebAppLinks, loadStoredWebAppLinks } from "../data/studentNetData";
 
-const webApps = [
-  {
-    name: "Best Choice for Chemistry",
-    url: "https://www.bestchoice.net.nz/",
-    logoUrl: "https://www.google.com/s2/favicons?domain=bestchoice.net.nz&sz=128",
-  },
-  {
-    name: "Google Classroom",
-    url: "https://classroom.google.com/",
-    logoUrl: "https://www.google.com/s2/favicons?domain=classroom.google.com&sz=128",
-  },
-  {
-    name: "Gmail",
-    url: "https://mail.google.com/",
-    logoUrl: "https://www.google.com/s2/favicons?domain=mail.google.com&sz=128",
-  },
-  {
-    name: "MyPortfolio",
-    url: "https://myportfolio.school.nz/",
-    logoUrl: "https://www.google.com/s2/favicons?domain=myportfolio.school.nz&sz=128",
-  },
-  {
-    name: "RefSeek",
-    url: "https://www.refseek.com/",
-    logoUrl: "https://www.google.com/s2/favicons?domain=refseek.com&sz=128",
-  },
-];
+function getLogoUrl(url) {
+  try {
+    const domain = new URL(url).hostname;
+    return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  } catch {
+    return "";
+  }
+}
 
-function WebAppCard({ name, url, logoUrl }) {
+function WebAppCard({ label, url }) {
+  const logoUrl = getLogoUrl(url);
+
   return (
     <article className="flex min-h-56 flex-col justify-between rounded-lg border border-[#F2901D] bg-white p-4 shadow-sm">
       <div className="flex flex-1 items-center justify-center">
         <img
           src={logoUrl}
-          alt={`${name} logo`}
+          alt={`${label} logo`}
           className="h-24 w-24 object-contain"
         />
       </div>
 
       <div className="flex items-end justify-between gap-4">
         <h2 className="text-sm font-medium text-gray-950">
-          {name}
+          {label}
         </h2>
 
         <a
@@ -58,6 +43,12 @@ function WebAppCard({ name, url, logoUrl }) {
 }
 
 export default function WebApps() {
+  const [webApps, setWebApps] = useState(() => getStoredWebAppLinks());
+
+  useEffect(() => {
+    loadStoredWebAppLinks().then(setWebApps);
+  }, []);
+
   return (
     <Layout>
       <section className="space-y-4">
@@ -73,7 +64,7 @@ export default function WebApps() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {webApps.map((app) => (
             <WebAppCard
-              key={app.name}
+              key={app.id}
               {...app}
             />
           ))}

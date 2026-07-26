@@ -3,9 +3,23 @@ import { useNavigate } from "react-router-dom";
 import {
   createId,
   curriculumLevels,
+  getStoredAnnouncements,
+  getStoredQuickLinks,
   getStoredSubjects,
+  getStoredStudentInfoLinks,
+  getStoredWebAppLinks,
   getStoredWeekItems,
+  loadStoredAnnouncements,
+  loadStoredQuickLinks,
+  loadStoredStudentInfoLinks,
+  loadStoredSubjects,
+  loadStoredWebAppLinks,
+  loadStoredWeekItems,
+  saveStoredAnnouncements,
+  saveStoredQuickLinks,
   saveStoredSubjects,
+  saveStoredStudentInfoLinks,
+  saveStoredWebAppLinks,
   saveStoredWeekItems,
 } from "../data/studentNetData";
 
@@ -16,7 +30,6 @@ const menuSections = [
     heading: "Home Page",
     items: [
       { id: "week", label: "What's on this week?" },
-      { id: "map", label: "Map of School" },
       { id: "announcements", label: "Announcement" },
     ],
   },
@@ -54,6 +67,17 @@ const blankWeekForm = {
   title: "",
   time: "",
   location: "",
+};
+
+const blankAnnouncementForm = {
+  title: "",
+  message: "",
+  date: "",
+};
+
+const blankLinkForm = {
+  label: "",
+  url: "",
 };
 
 function EditorInput({ label, value, onChange, placeholder }) {
@@ -103,16 +127,115 @@ function PlaceholderPanel({ title }) {
   );
 }
 
+function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave, onClear, onDelete }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+      <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-lg font-bold text-gray-950">
+            Links
+          </h3>
+
+          <button
+            type="button"
+            onClick={onClear}
+            className="rounded-md bg-[#F2901D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#d87d11]"
+          >
+            Add New
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          {links.map((link) => (
+            <button
+              key={link.id}
+              type="button"
+              onClick={() => onSelect(link)}
+              className={`w-full rounded-md border border-[#F2901D] px-3 py-3 text-left text-sm font-semibold transition ${
+                selectedId === link.id
+                  ? "bg-[#F2901D] text-white"
+                  : "bg-white text-gray-950 hover:bg-[#fff5e9]"
+              }`}
+            >
+              {link.label}
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <form
+        onSubmit={onSave}
+        className="rounded-lg border border-[#F2901D] bg-white p-4"
+      >
+        <h3 className="mb-4 text-lg font-bold text-gray-950">
+          {selectedId ? `Edit ${title}` : `Add ${title}`}
+        </h3>
+
+        <div className="space-y-4">
+          <EditorInput
+            label="Button Text"
+            value={form.label}
+            onChange={(value) => onChange("label", value)}
+            placeholder="Example: Kamar Portal"
+          />
+
+          <EditorInput
+            label="Link URL"
+            value={form.url}
+            onChange={(value) => onChange("url", value)}
+            placeholder="Example: https://example.com"
+          />
+        </div>
+
+        <div className="mt-5 flex flex-wrap gap-3">
+          <button
+            type="submit"
+            className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
+          >
+            Save Link
+          </button>
+
+          <button
+            type="button"
+            onClick={onClear}
+            className="rounded-md border border-[#F2901D] px-6 py-3 text-sm font-semibold text-gray-950 hover:bg-[#fff5e9]"
+          >
+            Clear
+          </button>
+
+          {selectedId && (
+            <button
+              type="button"
+              onClick={() => onDelete(selectedId)}
+              className="rounded-md border border-red-500 px-6 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}
+
 export default function TeacherPanel() {
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeEditor, setActiveEditor] = useState("level2");
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
+  const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
+  const [quickLinks, setQuickLinks] = useState(() => getStoredQuickLinks());
+  const [studentInfoLinks, setStudentInfoLinks] = useState(() => getStoredStudentInfoLinks());
+  const [webAppLinks, setWebAppLinks] = useState(() => getStoredWebAppLinks());
   const [selectedSubjectId, setSelectedSubjectId] = useState("");
   const [subjectForm, setSubjectForm] = useState(blankSubjectForm);
   const [selectedWeekItemId, setSelectedWeekItemId] = useState("");
   const [weekForm, setWeekForm] = useState(blankWeekForm);
+  const [selectedAnnouncementId, setSelectedAnnouncementId] = useState("");
+  const [announcementForm, setAnnouncementForm] = useState(blankAnnouncementForm);
+  const [selectedLinkId, setSelectedLinkId] = useState("");
+  const [linkForm, setLinkForm] = useState(blankLinkForm);
 
   const activeLevel = curriculumLevels.find((level) => level.id === activeEditor);
   const isSubjectEditor = Boolean(activeLevel);
@@ -121,6 +244,10 @@ export default function TeacherPanel() {
   const pageTitle = useMemo(() => {
     if (activeEditor === "week") {
       return "What's on this week?";
+    }
+
+    if (activeEditor === "announcements") {
+      return "Announcements";
     }
 
     if (activeLevel) {
@@ -159,6 +286,15 @@ export default function TeacherPanel() {
     };
   }, [navigate]);
 
+  useEffect(() => {
+    loadStoredSubjects().then(setSubjects);
+    loadStoredWeekItems().then(setWeekItems);
+    loadStoredAnnouncements().then(setAnnouncements);
+    loadStoredQuickLinks().then(setQuickLinks);
+    loadStoredStudentInfoLinks().then(setStudentInfoLinks);
+    loadStoredWebAppLinks().then(setWebAppLinks);
+  }, []);
+
   async function handleLogout() {
     await fetch(`${apiBaseUrl}/api/logout`, {
       method: "POST",
@@ -177,6 +313,20 @@ export default function TeacherPanel() {
 
   function updateWeekForm(field, value) {
     setWeekForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }));
+  }
+
+  function updateAnnouncementForm(field, value) {
+    setAnnouncementForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }));
+  }
+
+  function updateLinkForm(field, value) {
+    setLinkForm((currentForm) => ({
       ...currentForm,
       [field]: value,
     }));
@@ -282,6 +432,122 @@ export default function TeacherPanel() {
     clearWeekForm();
   }
 
+  function selectAnnouncement(announcement) {
+    setSelectedAnnouncementId(announcement.id);
+    setAnnouncementForm({
+      title: announcement.title,
+      message: announcement.message,
+      date: announcement.date,
+    });
+  }
+
+  function saveAnnouncement(event) {
+    event.preventDefault();
+
+    if (!announcementForm.title.trim()) {
+      return;
+    }
+
+    const savedAnnouncement = {
+      id: selectedAnnouncementId || createId("announcement"),
+      title: announcementForm.title.trim(),
+      message: announcementForm.message.trim(),
+      date: announcementForm.date.trim(),
+    };
+
+    const updatedAnnouncements = selectedAnnouncementId
+      ? announcements.map((announcement) =>
+          announcement.id === selectedAnnouncementId ? savedAnnouncement : announcement,
+        )
+      : [...announcements, savedAnnouncement];
+
+    setAnnouncements(updatedAnnouncements);
+    saveStoredAnnouncements(updatedAnnouncements);
+    setSelectedAnnouncementId(savedAnnouncement.id);
+  }
+
+  function clearAnnouncementForm() {
+    setSelectedAnnouncementId("");
+    setAnnouncementForm(blankAnnouncementForm);
+  }
+
+  function deleteAnnouncement(announcementId) {
+    const updatedAnnouncements = announcements.filter(
+      (announcement) => announcement.id !== announcementId,
+    );
+
+    setAnnouncements(updatedAnnouncements);
+    saveStoredAnnouncements(updatedAnnouncements);
+    clearAnnouncementForm();
+  }
+
+  function getActiveLinks() {
+    if (activeEditor === "quick-links") {
+      return quickLinks;
+    }
+
+    if (activeEditor === "student-info") {
+      return studentInfoLinks;
+    }
+
+    return webAppLinks;
+  }
+
+  function saveActiveLinks(links) {
+    if (activeEditor === "quick-links") {
+      setQuickLinks(links);
+      saveStoredQuickLinks(links);
+    } else if (activeEditor === "student-info") {
+      setStudentInfoLinks(links);
+      saveStoredStudentInfoLinks(links);
+    } else {
+      setWebAppLinks(links);
+      saveStoredWebAppLinks(links);
+    }
+  }
+
+  function selectLink(link) {
+    setSelectedLinkId(link.id);
+    setLinkForm({
+      label: link.label,
+      url: link.url,
+    });
+  }
+
+  function clearLinkForm() {
+    setSelectedLinkId("");
+    setLinkForm(blankLinkForm);
+  }
+
+  function saveLink(event) {
+    event.preventDefault();
+
+    if (!linkForm.label.trim()) {
+      return;
+    }
+
+    const activeLinks = getActiveLinks();
+    const savedLink = {
+      id: selectedLinkId || createId("link"),
+      label: linkForm.label.trim(),
+      url: linkForm.url.trim(),
+      isInternal: linkForm.url.trim().startsWith("/"),
+    };
+
+    const updatedLinks = selectedLinkId
+      ? activeLinks.map((link) => (link.id === selectedLinkId ? savedLink : link))
+      : [...activeLinks, savedLink];
+
+    saveActiveLinks(updatedLinks);
+    setSelectedLinkId(savedLink.id);
+  }
+
+  function deleteLink(linkId) {
+    const updatedLinks = getActiveLinks().filter((link) => link.id !== linkId);
+    saveActiveLinks(updatedLinks);
+    clearLinkForm();
+  }
+
   if (isCheckingAuth) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#404040] text-white">
@@ -292,7 +558,7 @@ export default function TeacherPanel() {
 
   return (
     <main className="min-h-screen bg-[#404040] p-5">
-      <section className="grid min-h-[calc(100vh-2.5rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-3 lg:grid-cols-[16rem_1fr]">
+      <section className="grid min-h-[calc(100vh-2.5rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-3 text-base lg:grid-cols-[17rem_1fr]">
         <aside className="rounded-lg border border-[#F2901D] bg-white p-3">
           <h1 className="mb-2 text-2xl font-bold text-gray-950">
             Menu:
@@ -301,7 +567,7 @@ export default function TeacherPanel() {
           <div className="space-y-3">
             {menuSections.map((section) => (
               <div key={section.heading}>
-                <h2 className="mb-1 text-sm font-medium text-gray-950">
+                <h2 className="mb-1 text-base font-medium text-gray-950">
                   {section.heading}:
                 </h2>
 
@@ -314,8 +580,10 @@ export default function TeacherPanel() {
                         setActiveEditor(item.id);
                         clearSubjectForm();
                         clearWeekForm();
+                        clearAnnouncementForm();
+                        clearLinkForm();
                       }}
-                      className={`w-full rounded-md border border-[#F2901D] px-3 py-2 text-xs transition hover:bg-[#fff5e9] ${
+                      className={`w-full rounded-md border border-[#F2901D] px-3 py-2 text-sm transition hover:bg-[#fff5e9] ${
                         activeEditor === item.id
                           ? "bg-[#F2901D] text-white hover:bg-[#d87d11]"
                           : "bg-white text-gray-950"
@@ -552,7 +820,120 @@ export default function TeacherPanel() {
             </div>
           )}
 
-          {!isSubjectEditor && activeEditor !== "week" && (
+          {activeEditor === "announcements" && (
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+              <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-bold text-gray-950">
+                    Announcements
+                  </h3>
+
+                  <button
+                    type="button"
+                    onClick={clearAnnouncementForm}
+                    className="rounded-md bg-[#F2901D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#d87d11]"
+                  >
+                    Add New
+                  </button>
+                </div>
+
+                <div className="space-y-2">
+                  {announcements.map((announcement) => (
+                    <button
+                      key={announcement.id}
+                      type="button"
+                      onClick={() => selectAnnouncement(announcement)}
+                      className={`w-full rounded-md border border-[#F2901D] px-3 py-3 text-left text-sm font-semibold transition ${
+                        selectedAnnouncementId === announcement.id
+                          ? "bg-[#F2901D] text-white"
+                          : "bg-white text-gray-950 hover:bg-[#fff5e9]"
+                      }`}
+                    >
+                      {announcement.title}
+                    </button>
+                  ))}
+                </div>
+              </aside>
+
+              <form
+                onSubmit={saveAnnouncement}
+                className="rounded-lg border border-[#F2901D] bg-white p-4"
+              >
+                <h3 className="mb-4 text-lg font-bold text-gray-950">
+                  {selectedAnnouncementId ? "Edit Announcement" : "Add Announcement"}
+                </h3>
+
+                <div className="space-y-4">
+                  <EditorInput
+                    label="Title"
+                    value={announcementForm.title}
+                    onChange={(value) => updateAnnouncementForm("title", value)}
+                    placeholder="Example: Uniform reminder"
+                  />
+
+                  <EditorInput
+                    label="Date"
+                    value={announcementForm.date}
+                    onChange={(value) => updateAnnouncementForm("date", value)}
+                    placeholder="Example: Today"
+                  />
+
+                  <EditorTextarea
+                    label="Message"
+                    value={announcementForm.message}
+                    onChange={(value) => updateAnnouncementForm("message", value)}
+                    placeholder="Write the announcement..."
+                  />
+                </div>
+
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <button
+                    type="submit"
+                    className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
+                  >
+                    Save Announcement
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={clearAnnouncementForm}
+                    className="rounded-md border border-[#F2901D] px-6 py-3 text-sm font-semibold text-gray-950 hover:bg-[#fff5e9]"
+                  >
+                    Clear
+                  </button>
+
+                  {selectedAnnouncementId && (
+                    <button
+                      type="button"
+                      onClick={() => deleteAnnouncement(selectedAnnouncementId)}
+                      className="rounded-md border border-red-500 px-6 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
+
+          {["apps", "student-info", "quick-links"].includes(activeEditor) && (
+            <LinkEditor
+              title={pageTitle}
+              links={getActiveLinks()}
+              selectedId={selectedLinkId}
+              form={linkForm}
+              onSelect={selectLink}
+              onChange={updateLinkForm}
+              onSave={saveLink}
+              onClear={clearLinkForm}
+              onDelete={deleteLink}
+            />
+          )}
+
+          {!isSubjectEditor &&
+            activeEditor !== "week" &&
+            activeEditor !== "announcements" &&
+            !["apps", "student-info", "quick-links"].includes(activeEditor) && (
             <PlaceholderPanel title={pageTitle} />
           )}
         </section>

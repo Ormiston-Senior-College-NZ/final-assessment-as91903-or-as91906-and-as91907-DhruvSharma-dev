@@ -110,6 +110,63 @@ export const defaultWeekItems = [
   },
 ];
 
+export const defaultAnnouncements = [
+  {
+    id: "announcement-welcome",
+    title: "Welcome to StudentNET",
+    message: "Check this dashboard for key school updates and notices.",
+    date: "Today",
+  },
+  {
+    id: "announcement-reminder",
+    title: "Bring your device",
+    message: "Students should bring a charged device to school each day.",
+    date: "This week",
+  },
+];
+
+export const defaultQuickLinks = [
+  { id: "norms", label: "Norms", url: "/norms", isInternal: true },
+  { id: "kamar", label: "Kamar Portal", url: "https://ormiston.school.kiwi/" },
+  {
+    id: "wifi",
+    label: "Wi-Fi Setup",
+    url: "https://drive.google.com/drive/folders/132RJOXYCqDDaKhRiS3AfWgMS6K676BiE?usp=sharing",
+  },
+  {
+    id: "clubs",
+    label: "School Clubs",
+    url: "https://docs.google.com/spreadsheets/d/1gjfaDCoq37gcznVxVUboHnfdCc43wJjR5Z-bd2BQcgQ/edit?gid=1149952797#gid=1149952797",
+  },
+  {
+    id: "itime",
+    label: "I-Time Tutorials",
+    url: "https://docs.google.com/spreadsheets/d/1_qqpln-KH4U-Iuwl46oOmiXY58sk4GyxAgSK0MMilKM/edit?gid=105554696#gid=105554696",
+  },
+];
+
+export const defaultStudentInfoLinks = [
+  { id: "leadership", label: "Student Leadership", url: "" },
+  { id: "doe", label: "DoE at OSC", url: "" },
+  {
+    id: "sports",
+    label: "Sports",
+    url: "https://sites.google.com/ormiston.school.nz/oscsports/welcome",
+  },
+];
+
+export const defaultWebAppLinks = [
+  {
+    id: "best-choice",
+    label: "Best Choice for Chemistry",
+    url: "https://www.bestchoice.net.nz/",
+  },
+  { id: "classroom", label: "Google Classroom", url: "https://classroom.google.com/" },
+  { id: "gmail", label: "Gmail", url: "https://mail.google.com/" },
+  { id: "myportfolio", label: "MyPortfolio", url: "https://myportfolio.school.nz/" },
+  { id: "refseek", label: "RefSeek", url: "https://www.refseek.com/" },
+];
+
 export const eventCalendarSheet = {
   spreadsheetId: "173F-7IVXVgB9K0Cfz_GAPs5iFL6sfYq3Pi0-Ulhq794",
   gid: "660379046",
@@ -119,8 +176,13 @@ export const eventCalendarViewUrl = `https://docs.google.com/spreadsheets/d/${ev
 
 export const eventCalendarEmbedUrl = `https://docs.google.com/spreadsheets/d/${eventCalendarSheet.spreadsheetId}/preview?gid=${eventCalendarSheet.gid}`;
 
+const apiBaseUrl = "http://localhost:5000";
 const subjectsStorageKey = "studentnet-curriculum-subjects";
 const weekStorageKey = "studentnet-whats-on-this-week";
+const announcementsStorageKey = "studentnet-announcements";
+const quickLinksStorageKey = "studentnet-quick-links";
+const studentInfoLinksStorageKey = "studentnet-student-info-links";
+const webAppLinksStorageKey = "studentnet-web-app-links";
 
 function readStoredValue(key, fallbackValue) {
   if (typeof window === "undefined") {
@@ -142,10 +204,44 @@ function readStoredValue(key, fallbackValue) {
 
 function writeStoredValue(key, value) {
   window.localStorage.setItem(key, JSON.stringify(value));
+  saveContentToDatabase(key, value);
+}
+
+async function loadContentFromDatabase(key, fallbackValue) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/content/${key}`);
+
+    if (!response.ok) {
+      return fallbackValue;
+    }
+
+    const data = await response.json();
+    const value = data.value ?? fallbackValue;
+    window.localStorage.setItem(key, JSON.stringify(value));
+
+    return value;
+  } catch {
+    return fallbackValue;
+  }
+}
+
+function saveContentToDatabase(key, value) {
+  fetch(`${apiBaseUrl}/api/content/${key}`, {
+    method: "PUT",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ value }),
+  }).catch(() => {});
 }
 
 export function getStoredSubjects() {
   return readStoredValue(subjectsStorageKey, defaultSubjects);
+}
+
+export function loadStoredSubjects() {
+  return loadContentFromDatabase(subjectsStorageKey, getStoredSubjects());
 }
 
 export function saveStoredSubjects(subjects) {
@@ -156,8 +252,60 @@ export function getStoredWeekItems() {
   return readStoredValue(weekStorageKey, defaultWeekItems);
 }
 
+export function loadStoredWeekItems() {
+  return loadContentFromDatabase(weekStorageKey, getStoredWeekItems());
+}
+
 export function saveStoredWeekItems(weekItems) {
   writeStoredValue(weekStorageKey, weekItems);
+}
+
+export function getStoredAnnouncements() {
+  return readStoredValue(announcementsStorageKey, defaultAnnouncements);
+}
+
+export function loadStoredAnnouncements() {
+  return loadContentFromDatabase(announcementsStorageKey, getStoredAnnouncements());
+}
+
+export function saveStoredAnnouncements(announcements) {
+  writeStoredValue(announcementsStorageKey, announcements);
+}
+
+export function getStoredQuickLinks() {
+  return readStoredValue(quickLinksStorageKey, defaultQuickLinks);
+}
+
+export function loadStoredQuickLinks() {
+  return loadContentFromDatabase(quickLinksStorageKey, getStoredQuickLinks());
+}
+
+export function saveStoredQuickLinks(links) {
+  writeStoredValue(quickLinksStorageKey, links);
+}
+
+export function getStoredStudentInfoLinks() {
+  return readStoredValue(studentInfoLinksStorageKey, defaultStudentInfoLinks);
+}
+
+export function loadStoredStudentInfoLinks() {
+  return loadContentFromDatabase(studentInfoLinksStorageKey, getStoredStudentInfoLinks());
+}
+
+export function saveStoredStudentInfoLinks(links) {
+  writeStoredValue(studentInfoLinksStorageKey, links);
+}
+
+export function getStoredWebAppLinks() {
+  return readStoredValue(webAppLinksStorageKey, defaultWebAppLinks);
+}
+
+export function loadStoredWebAppLinks() {
+  return loadContentFromDatabase(webAppLinksStorageKey, getStoredWebAppLinks());
+}
+
+export function saveStoredWebAppLinks(links) {
+  writeStoredValue(webAppLinksStorageKey, links);
 }
 
 export function createId(prefix) {

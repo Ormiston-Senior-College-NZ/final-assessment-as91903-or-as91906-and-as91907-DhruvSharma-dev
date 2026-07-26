@@ -1,3 +1,4 @@
+import json
 import os
 import sqlite3
 
@@ -32,6 +33,16 @@ def setup_database():
                 email TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 is_active INTEGER NOT NULL DEFAULT 1
+            )
+            """
+        )
+
+        connection.execute(
+            """
+            CREATE TABLE IF NOT EXISTS content (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
             """
         )
@@ -79,7 +90,7 @@ def add_cors_headers(response):
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers["Access-Control-Allow-Methods"] = "GET,POST,OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,OPTIONS"
 
     return response
 
@@ -119,6 +130,45 @@ def current_user():
         return jsonify({"teacher": None}), 401
 
     return jsonify({"teacher": {"email": teacher_email}})
+
+
+@app.route("/api/content/<content_key>", methods=["GET", "PUT", "OPTIONS"])
+def content(content_key):
+    if request.method == "OPTIONS":
+        return "", 204
+
+    if request.method == "GET":
+        with get_database_connection() as connection:
+            saved_content = connection.execute(
+                "SELECT value FROM content WHERE key = ?",
+                (content_key,),
+            ).fetchone()
+
+        if not saved_content:
+            return jsonify({"value": None}), 404
+
+        return jsonify({"value": json.loads(saved_content["value"])})
+
+    teacher_email = session.get("teacher_email")
+
+    if not teacher_email or not is_teacher_active(teacher_email):
+        return jsonify({"message": "Teacher login required."}), 401
+
+    data = request.get_json(silent=True) or {}
+
+    with get_database_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO content (key, value, updated_at)
+            VALUES (?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                updated_at = CURRENT_TIMESTAMP
+            """,
+            (content_key, json.dumps(data.get("value"))),
+        )
+
+    return jsonify({"message": "Saved."})
 
 
 @app.route("/api/health")

@@ -1,14 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Layout from "../components/Layout";
 import {
   curriculumLevels,
   getStoredSubjects,
+  loadStoredSubjects,
 } from "../data/studentNetData";
 
 export default function Curriculum() {
   const [activeLevel, setActiveLevel] = useState("level2");
   const [searchTerm, setSearchTerm] = useState("");
-  const [subjects] = useState(() => getStoredSubjects());
+  const [subjects, setSubjects] = useState(() => getStoredSubjects());
+
+  useEffect(() => {
+    loadStoredSubjects().then(setSubjects);
+  }, []);
 
   const filteredSubjects = useMemo(() => {
     const activeSubjects = subjects[activeLevel] || [];

@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";
 import { Link } from "react-router-dom";
 import {
   eventCalendarEmbedUrl,
   eventCalendarViewUrl,
+  getStoredAnnouncements,
   getStoredWeekItems,
+  loadStoredAnnouncements,
+  loadStoredWeekItems,
 } from "../data/studentNetData";
 import mapOne from "../assets/map-1.jpg";
 import mapTwo from "../assets/map-2.jpg";
@@ -27,7 +30,8 @@ const schoolMaps = [
 ];
 
 export default function Home() {
-  const [weekItems] = useState(() => getStoredWeekItems());
+  const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
+  const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
   const [calendarFrameKey, setCalendarFrameKey] = useState(0);
   const [activeMapIndex, setActiveMapIndex] = useState(0);
   const activeMap = schoolMaps[activeMapIndex];
@@ -43,6 +47,11 @@ export default function Home() {
       currentIndex === schoolMaps.length - 1 ? 0 : currentIndex + 1,
     );
   }
+
+  useEffect(() => {
+    loadStoredWeekItems().then(setWeekItems);
+    loadStoredAnnouncements().then(setAnnouncements);
+  }, []);
 
   return (
     <Layout>
@@ -206,7 +215,30 @@ export default function Home() {
           <DashboardCard
             title="Announcements"
             className="min-h-96 lg:col-span-4"
-          />
+          >
+            <div className="space-y-3">
+              {announcements.map((announcement) => (
+                <article
+                  key={announcement.id}
+                  className="rounded-md border border-[#F2901D]/40 bg-[#fff8ec] px-4 py-3"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-base font-bold text-gray-950">
+                      {announcement.title}
+                    </h3>
+
+                    <p className="text-xs font-semibold text-[#F2901D]">
+                      {announcement.date}
+                    </p>
+                  </div>
+
+                  <p className="mt-2 text-sm leading-6 text-gray-700">
+                    {announcement.message}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </DashboardCard>
 
         </div>
 
