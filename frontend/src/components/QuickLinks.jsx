@@ -34,11 +34,12 @@ export default function QuickLinks() {
     <div className="fixed bottom-3 left-0 right-0 z-50 px-3 sm:bottom-4 sm:px-6">
       <div
         className="
+          relative
           mx-auto
           max-w-488
           bg-white
           rounded-xl
-          shadow-md
+          shadow-[0_-18px_45px_rgba(0,0,0,0.45)]
           border
           border-[#C49A00]
           px-3

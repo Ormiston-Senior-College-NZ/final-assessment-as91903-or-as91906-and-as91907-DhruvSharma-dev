@@ -27,11 +27,12 @@ export default function Navbar() {
     <div className="fixed left-0 right-0 top-3 z-50 px-3 sm:px-6">
       <nav
         className="
+          relative
           mx-auto
           max-w-488
           bg-white
           rounded-xl
-          shadow-md
+          shadow-[0_18px_45px_rgba(0,0,0,0.45)]
           min-h-16
           px-3
           py-3

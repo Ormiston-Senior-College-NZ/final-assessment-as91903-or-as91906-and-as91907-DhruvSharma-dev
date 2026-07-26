@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   createId,
   curriculumLevels,
+  getStoredCareersSupport,
   getStoredAnnouncements,
   getStoredQuickLinks,
   getStoredSubjects,
@@ -10,12 +11,14 @@ import {
   getStoredWebAppLinks,
   getStoredWeekItems,
   loadStoredAnnouncements,
+  loadStoredCareersSupport,
   loadStoredQuickLinks,
   loadStoredStudentInfoLinks,
   loadStoredSubjects,
   loadStoredWebAppLinks,
   loadStoredWeekItems,
   saveStoredAnnouncements,
+  saveStoredCareersSupport,
   saveStoredQuickLinks,
   saveStoredSubjects,
   saveStoredStudentInfoLinks,
@@ -45,6 +48,10 @@ const menuSections = [
   {
     heading: "Web-Based Apps",
     items: [{ id: "apps", label: "App Links" }],
+  },
+  {
+    heading: "Careers Page",
+    items: [{ id: "careers-support", label: "Careers Support" }],
   },
   {
     heading: "Student Info",
@@ -225,6 +232,9 @@ export default function TeacherPanel() {
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
   const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
+  const [careersSupport, setCareersSupport] = useState(() =>
+    getStoredCareersSupport(),
+  );
   const [quickLinks, setQuickLinks] = useState(() => getStoredQuickLinks());
   const [studentInfoLinks, setStudentInfoLinks] = useState(() => getStoredStudentInfoLinks());
   const [webAppLinks, setWebAppLinks] = useState(() => getStoredWebAppLinks());
@@ -234,6 +244,9 @@ export default function TeacherPanel() {
   const [weekForm, setWeekForm] = useState(blankWeekForm);
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState("");
   const [announcementForm, setAnnouncementForm] = useState(blankAnnouncementForm);
+  const [careersSupportForm, setCareersSupportForm] = useState(() =>
+    getStoredCareersSupport(),
+  );
   const [selectedLinkId, setSelectedLinkId] = useState("");
   const [linkForm, setLinkForm] = useState(blankLinkForm);
 
@@ -248,6 +261,10 @@ export default function TeacherPanel() {
 
     if (activeEditor === "announcements") {
       return "Announcements";
+    }
+
+    if (activeEditor === "careers-support") {
+      return "Careers Support";
     }
 
     if (activeLevel) {
@@ -290,6 +307,10 @@ export default function TeacherPanel() {
     loadStoredSubjects().then(setSubjects);
     loadStoredWeekItems().then(setWeekItems);
     loadStoredAnnouncements().then(setAnnouncements);
+    loadStoredCareersSupport().then((content) => {
+      setCareersSupport(content);
+      setCareersSupportForm(content);
+    });
     loadStoredQuickLinks().then(setQuickLinks);
     loadStoredStudentInfoLinks().then(setStudentInfoLinks);
     loadStoredWebAppLinks().then(setWebAppLinks);
@@ -320,6 +341,13 @@ export default function TeacherPanel() {
 
   function updateAnnouncementForm(field, value) {
     setAnnouncementForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }));
+  }
+
+  function updateCareersSupportForm(field, value) {
+    setCareersSupportForm((currentForm) => ({
       ...currentForm,
       [field]: value,
     }));
@@ -481,6 +509,18 @@ export default function TeacherPanel() {
     clearAnnouncementForm();
   }
 
+  function saveCareersSupport(event) {
+    event.preventDefault();
+
+    const savedContent = {
+      title: careersSupportForm.title.trim() || "Careers Support at OSC",
+      message: careersSupportForm.message.trim(),
+    };
+
+    setCareersSupport(savedContent);
+    saveStoredCareersSupport(savedContent);
+  }
+
   function getActiveLinks() {
     if (activeEditor === "quick-links") {
       return quickLinks;
@@ -581,6 +621,7 @@ export default function TeacherPanel() {
                         clearSubjectForm();
                         clearWeekForm();
                         clearAnnouncementForm();
+                        setCareersSupportForm(careersSupport);
                         clearLinkForm();
                       }}
                       className={`w-full rounded-md border border-[#F2901D] px-3 py-2 text-sm transition hover:bg-[#fff5e9] ${
@@ -916,6 +957,40 @@ export default function TeacherPanel() {
             </div>
           )}
 
+          {activeEditor === "careers-support" && (
+            <form
+              onSubmit={saveCareersSupport}
+              className="rounded-lg border border-[#F2901D] bg-white p-4"
+            >
+              <h3 className="mb-4 text-lg font-bold text-gray-950">
+                Edit Careers Support Section
+              </h3>
+
+              <div className="space-y-4">
+                <EditorInput
+                  label="Heading"
+                  value={careersSupportForm.title}
+                  onChange={(value) => updateCareersSupportForm("title", value)}
+                  placeholder="Example: Careers Support at OSC"
+                />
+
+                <EditorTextarea
+                  label="Message"
+                  value={careersSupportForm.message}
+                  onChange={(value) => updateCareersSupportForm("message", value)}
+                  placeholder="Write what the Careers team wants students to know..."
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="mt-5 rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
+              >
+                Save Careers Support
+              </button>
+            </form>
+          )}
+
           {["apps", "student-info", "quick-links"].includes(activeEditor) && (
             <LinkEditor
               title={pageTitle}
@@ -933,6 +1008,7 @@ export default function TeacherPanel() {
           {!isSubjectEditor &&
             activeEditor !== "week" &&
             activeEditor !== "announcements" &&
+            activeEditor !== "careers-support" &&
             !["apps", "student-info", "quick-links"].includes(activeEditor) && (
             <PlaceholderPanel title={pageTitle} />
           )}

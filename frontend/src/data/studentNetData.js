@@ -167,6 +167,12 @@ export const defaultWebAppLinks = [
   { id: "refseek", label: "RefSeek", url: "https://www.refseek.com/" },
 ];
 
+export const defaultCareersSupport = {
+  title: "Careers Support at OSC",
+  message:
+    "The Careers Department supports students with pathways, university planning, apprenticeships, scholarships, Gateway, and career decision making.",
+};
+
 export const eventCalendarSheet = {
   spreadsheetId: "173F-7IVXVgB9K0Cfz_GAPs5iFL6sfYq3Pi0-Ulhq794",
   gid: "660379046",
@@ -183,6 +189,7 @@ const announcementsStorageKey = "studentnet-announcements";
 const quickLinksStorageKey = "studentnet-quick-links";
 const studentInfoLinksStorageKey = "studentnet-student-info-links";
 const webAppLinksStorageKey = "studentnet-web-app-links";
+const careersSupportStorageKey = "studentnet-careers-support";
 
 function readStoredValue(key, fallbackValue) {
   if (typeof window === "undefined") {
@@ -306,6 +313,18 @@ export function loadStoredWebAppLinks() {
 
 export function saveStoredWebAppLinks(links) {
   writeStoredValue(webAppLinksStorageKey, links);
+}
+
+export function getStoredCareersSupport() {
+  return readStoredValue(careersSupportStorageKey, defaultCareersSupport);
+}
+
+export function loadStoredCareersSupport() {
+  return loadContentFromDatabase(careersSupportStorageKey, getStoredCareersSupport());
+}
+
+export function saveStoredCareersSupport(content) {
+  writeStoredValue(careersSupportStorageKey, content);
 }
 
 export function createId(prefix) {

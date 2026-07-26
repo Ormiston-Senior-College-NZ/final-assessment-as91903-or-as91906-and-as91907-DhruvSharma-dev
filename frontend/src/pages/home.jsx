@@ -114,7 +114,7 @@ export default function Home() {
           </DashboardCard>
 
           <DashboardCard
-            title="Filter"
+            title="Sheet Options"
             className="min-h-112 lg:col-span-2"
           >
             <div className="space-y-3">
