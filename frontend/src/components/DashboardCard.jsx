@@ -4,6 +4,7 @@ export default function DashboardCard({
   className = "",
 }) {
   return (
+    /* Reusable white dashboard card used across the home page and content pages. */
     <div
       className={`
         bg-white

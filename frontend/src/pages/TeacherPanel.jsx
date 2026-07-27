@@ -28,6 +28,7 @@ import {
 
 const apiBaseUrl = "http://localhost:5000";
 
+// Sidebar menu options choose which part of the website a teacher edits.
 const menuSections = [
   {
     heading: "Home Page",
@@ -63,12 +64,14 @@ const menuSections = [
   },
 ];
 
+// Empty form values used when adding a new subject.
 const blankSubjectForm = {
   name: "",
   description: "",
   pathway: "",
 };
 
+// Empty form values used when adding a new weekly item.
 const blankWeekForm = {
   day: "",
   title: "",
@@ -76,18 +79,21 @@ const blankWeekForm = {
   location: "",
 };
 
+// Empty form values used when adding a new announcement.
 const blankAnnouncementForm = {
   title: "",
   message: "",
   date: "",
 };
 
+// Empty form values used when adding a new editable link.
 const blankLinkForm = {
   label: "",
   url: "",
 };
 
 function EditorInput({ label, value, onChange, placeholder }) {
+  // Small reusable text input used by the different teacher editors.
   return (
     <label className="block">
       <span className="mb-1 block text-sm font-bold text-gray-950">
@@ -105,6 +111,7 @@ function EditorInput({ label, value, onChange, placeholder }) {
 }
 
 function EditorTextarea({ label, value, onChange, placeholder }) {
+  // Small reusable larger text box for longer editable content.
   return (
     <label className="block">
       <span className="mb-1 block text-sm font-bold text-gray-950">
@@ -122,6 +129,7 @@ function EditorTextarea({ label, value, onChange, placeholder }) {
 }
 
 function PlaceholderPanel({ title }) {
+  // Temporary panel for menu items that are planned but not built yet.
   return (
     <div className="rounded-lg border border-[#F2901D] bg-white p-6">
       <h2 className="text-2xl font-bold text-gray-950">
@@ -135,6 +143,7 @@ function PlaceholderPanel({ title }) {
 }
 
 function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave, onClear, onDelete }) {
+  // Reusable editor for Quick Links, Student Info links, and Web App links.
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
       <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
@@ -226,6 +235,7 @@ function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave
 }
 
 export default function TeacherPanel() {
+  // Teacher Panel state stores the selected editor and all editable form values.
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [activeEditor, setActiveEditor] = useState("level2");
@@ -255,6 +265,7 @@ export default function TeacherPanel() {
   const activeSubjects = isSubjectEditor ? subjects[activeEditor] || [] : [];
 
   const pageTitle = useMemo(() => {
+    // The heading changes based on the selected sidebar menu item.
     if (activeEditor === "week") {
       return "What's on this week?";
     }
@@ -276,6 +287,7 @@ export default function TeacherPanel() {
   }, [activeEditor, activeLevel]);
 
   useEffect(() => {
+    // Check with Flask that the teacher is logged in before showing the panel.
     let isMounted = true;
 
     async function checkTeacherSession() {
@@ -304,6 +316,7 @@ export default function TeacherPanel() {
   }, [navigate]);
 
   useEffect(() => {
+    // Load editable content from Flask/SQLite when the panel opens.
     loadStoredSubjects().then(setSubjects);
     loadStoredWeekItems().then(setWeekItems);
     loadStoredAnnouncements().then(setAnnouncements);
@@ -317,6 +330,7 @@ export default function TeacherPanel() {
   }, []);
 
   async function handleLogout() {
+    // End the Flask session and return to the login page.
     await fetch(`${apiBaseUrl}/api/logout`, {
       method: "POST",
       credentials: "include",
@@ -326,6 +340,7 @@ export default function TeacherPanel() {
   }
 
   function updateSubjectForm(field, value) {
+    // Update one subject form field without changing the other fields.
     setSubjectForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -333,6 +348,7 @@ export default function TeacherPanel() {
   }
 
   function updateWeekForm(field, value) {
+    // Update one weekly event form field.
     setWeekForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -340,6 +356,7 @@ export default function TeacherPanel() {
   }
 
   function updateAnnouncementForm(field, value) {
+    // Update one announcement form field.
     setAnnouncementForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -347,6 +364,7 @@ export default function TeacherPanel() {
   }
 
   function updateCareersSupportForm(field, value) {
+    // Update either the careers heading or message.
     setCareersSupportForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -354,6 +372,7 @@ export default function TeacherPanel() {
   }
 
   function updateLinkForm(field, value) {
+    // Update the shared link form used by several editors.
     setLinkForm((currentForm) => ({
       ...currentForm,
       [field]: value,
@@ -361,6 +380,7 @@ export default function TeacherPanel() {
   }
 
   function selectSubject(subject) {
+    // Fill the form with an existing subject so it can be edited.
     setSelectedSubjectId(subject.id);
     setSubjectForm({
       name: subject.name,
@@ -370,6 +390,7 @@ export default function TeacherPanel() {
   }
 
   function saveSubject(event) {
+    // Add or update a subject in the selected curriculum level.
     event.preventDefault();
 
     if (!subjectForm.name.trim()) {
@@ -398,11 +419,13 @@ export default function TeacherPanel() {
   }
 
   function clearSubjectForm() {
+    // Reset the subject form back to a blank "add new" state.
     setSelectedSubjectId("");
     setSubjectForm(blankSubjectForm);
   }
 
   function deleteSubject(subjectId) {
+    // Remove the selected subject from the current level only.
     const updatedSubjects = {
       ...subjects,
       [activeEditor]: activeSubjects.filter((subject) => subject.id !== subjectId),
@@ -414,6 +437,7 @@ export default function TeacherPanel() {
   }
 
   function selectWeekItem(item) {
+    // Fill the form with an existing weekly item.
     setSelectedWeekItemId(item.id);
     setWeekForm({
       day: item.day,
@@ -424,6 +448,7 @@ export default function TeacherPanel() {
   }
 
   function saveWeekItem(event) {
+    // Add or update an item in the "What's on this week" home card.
     event.preventDefault();
 
     if (!weekForm.title.trim()) {
@@ -448,11 +473,13 @@ export default function TeacherPanel() {
   }
 
   function clearWeekForm() {
+    // Reset the weekly item form.
     setSelectedWeekItemId("");
     setWeekForm(blankWeekForm);
   }
 
   function deleteWeekItem(itemId) {
+    // Remove one item from the home page week list.
     const updatedWeekItems = weekItems.filter((item) => item.id !== itemId);
 
     setWeekItems(updatedWeekItems);
@@ -461,6 +488,7 @@ export default function TeacherPanel() {
   }
 
   function selectAnnouncement(announcement) {
+    // Fill the form with an existing announcement.
     setSelectedAnnouncementId(announcement.id);
     setAnnouncementForm({
       title: announcement.title,
@@ -470,6 +498,7 @@ export default function TeacherPanel() {
   }
 
   function saveAnnouncement(event) {
+    // Add or update an announcement shown on the home page.
     event.preventDefault();
 
     if (!announcementForm.title.trim()) {
@@ -495,11 +524,13 @@ export default function TeacherPanel() {
   }
 
   function clearAnnouncementForm() {
+    // Reset the announcement form.
     setSelectedAnnouncementId("");
     setAnnouncementForm(blankAnnouncementForm);
   }
 
   function deleteAnnouncement(announcementId) {
+    // Remove one announcement from the home page list.
     const updatedAnnouncements = announcements.filter(
       (announcement) => announcement.id !== announcementId,
     );
@@ -510,6 +541,7 @@ export default function TeacherPanel() {
   }
 
   function saveCareersSupport(event) {
+    // Save the text shown underneath the Careers staff cards.
     event.preventDefault();
 
     const savedContent = {
@@ -522,6 +554,7 @@ export default function TeacherPanel() {
   }
 
   function getActiveLinks() {
+    // Pick the correct editable link list based on the selected menu item.
     if (activeEditor === "quick-links") {
       return quickLinks;
     }
@@ -534,6 +567,7 @@ export default function TeacherPanel() {
   }
 
   function saveActiveLinks(links) {
+    // Save the selected link list back to shared storage and SQLite.
     if (activeEditor === "quick-links") {
       setQuickLinks(links);
       saveStoredQuickLinks(links);
@@ -547,6 +581,7 @@ export default function TeacherPanel() {
   }
 
   function selectLink(link) {
+    // Fill the link form when a teacher clicks an existing link.
     setSelectedLinkId(link.id);
     setLinkForm({
       label: link.label,
@@ -555,11 +590,13 @@ export default function TeacherPanel() {
   }
 
   function clearLinkForm() {
+    // Reset the link form back to a blank "add new" state.
     setSelectedLinkId("");
     setLinkForm(blankLinkForm);
   }
 
   function saveLink(event) {
+    // Save a new link, or update the selected link if one is already chosen.
     event.preventDefault();
 
     if (!linkForm.label.trim()) {
@@ -571,6 +608,7 @@ export default function TeacherPanel() {
       id: selectedLinkId || createId("link"),
       label: linkForm.label.trim(),
       url: linkForm.url.trim(),
+      // URLs starting with "/" use React Router; full URLs open as external links.
       isInternal: linkForm.url.trim().startsWith("/"),
     };
 
@@ -583,12 +621,14 @@ export default function TeacherPanel() {
   }
 
   function deleteLink(linkId) {
+    // Delete one link from whichever link editor is currently open.
     const updatedLinks = getActiveLinks().filter((link) => link.id !== linkId);
     saveActiveLinks(updatedLinks);
     clearLinkForm();
   }
 
   if (isCheckingAuth) {
+    // Show a simple loading state while Flask checks the teacher session.
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#404040] text-white">
         Checking teacher access...
@@ -617,6 +657,7 @@ export default function TeacherPanel() {
                       key={item.id}
                       type="button"
                       onClick={() => {
+                        // Reset forms when switching editors so old values do not carry across.
                         setActiveEditor(item.id);
                         clearSubjectForm();
                         clearWeekForm();
@@ -659,6 +700,7 @@ export default function TeacherPanel() {
             </button>
           </div>
 
+          {/* Subject editor is reused for Level 1, Level 2, Level 3, and Scholarships. */}
           {isSubjectEditor && (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
@@ -755,6 +797,7 @@ export default function TeacherPanel() {
             </div>
           )}
 
+          {/* This editor controls the "What's on this week?" card on the Home page. */}
           {activeEditor === "week" && (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
@@ -861,6 +904,7 @@ export default function TeacherPanel() {
             </div>
           )}
 
+          {/* This editor controls the Announcements card on the Home page. */}
           {activeEditor === "announcements" && (
             <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
@@ -957,6 +1001,7 @@ export default function TeacherPanel() {
             </div>
           )}
 
+          {/* This editor controls the editable text section on the Careers page. */}
           {activeEditor === "careers-support" && (
             <form
               onSubmit={saveCareersSupport}
@@ -991,6 +1036,7 @@ export default function TeacherPanel() {
             </form>
           )}
 
+          {/* One shared link editor handles app links, student info links, and quick links. */}
           {["apps", "student-info", "quick-links"].includes(activeEditor) && (
             <LinkEditor
               title={pageTitle}

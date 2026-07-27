@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getStoredQuickLinks, loadStoredQuickLinks } from "../data/studentNetData";
 
+// Shared style for internal and external quick link buttons.
 const quickLinkClass = `
   flex
   h-11
@@ -24,6 +25,7 @@ const quickLinkClass = `
 `;
 
 export default function QuickLinks() {
+  // Load saved quick links so teachers can edit them from the panel.
   const [quickLinks, setQuickLinks] = useState(() => getStoredQuickLinks());
 
   useEffect(() => {

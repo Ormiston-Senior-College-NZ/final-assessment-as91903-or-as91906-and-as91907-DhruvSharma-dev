@@ -5,6 +5,7 @@ import logo from "../assets/osc-logo.png";
 const apiBaseUrl = "http://localhost:5000";
 
 export default function TeacherLogin() {
+  // Form state for the teacher login fields and messages.
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,11 +13,14 @@ export default function TeacherLogin() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {
+    // Send the teacher login details to Flask.
     event.preventDefault();
+    // Clear old errors before trying a new login.
     setErrorMessage("");
     setIsSubmitting(true);
 
     try {
+      // credentials: "include" lets Flask set/read the session cookie.
       const response = await fetch(`${apiBaseUrl}/api/login`, {
         method: "POST",
         credentials: "include",
@@ -30,8 +34,10 @@ export default function TeacherLogin() {
         throw new Error("Invalid email or password.");
       }
 
+      // A successful login sends the teacher into the protected panel.
       navigate("/teacher-panel");
     } catch (error) {
+      // Show a friendly message instead of crashing the page.
       setErrorMessage(error.message);
     } finally {
       setIsSubmitting(false);
@@ -40,6 +46,7 @@ export default function TeacherLogin() {
 
   return (
     <main className="min-h-screen bg-[#404040] px-4 py-8">
+      {/* Blurred background keeps the login modal visually connected to the panel. */}
       <div className="absolute inset-0 overflow-hidden opacity-45 blur-sm">
         <div className="mx-auto mt-4 max-w-7xl rounded-xl border border-[#F2901D] bg-white p-4">
           <div className="grid grid-cols-[16rem_1fr] gap-3">
@@ -50,6 +57,7 @@ export default function TeacherLogin() {
       </div>
 
       <section className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center">
+        {/* Login form displayed above the blurred panel background. */}
         <form
           onSubmit={handleSubmit}
           className="relative w-full max-w-3xl rounded-xl border border-[#F2901D] bg-white px-12 py-10 shadow-2xl"
@@ -59,6 +67,7 @@ export default function TeacherLogin() {
             aria-label="Close and return to home"
             className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#F2901D]"
           >
+            {/* Simple close icon that returns users to the home dashboard. */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -106,6 +115,7 @@ export default function TeacherLogin() {
             />
           </div>
 
+          {/* Only show the error box after a failed login. */}
           {errorMessage && (
             <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
               {errorMessage}

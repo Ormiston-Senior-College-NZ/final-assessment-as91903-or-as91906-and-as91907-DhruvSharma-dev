@@ -5,15 +5,19 @@ import Layout from "../components/Layout";
 import { getStoredWebAppLinks, loadStoredWebAppLinks } from "../data/studentNetData";
 
 function getLogoUrl(url) {
+  // Use Google's favicon service to show a simple logo for each web app.
   try {
+    // URL() pulls out just the domain, for example mail.google.com.
     const domain = new URL(url).hostname;
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   } catch {
+    // If the URL is empty or invalid, return no image instead of breaking.
     return "";
   }
 }
 
 function WebAppCard({ label, url, highlight }) {
+  // One web app card with a logo, name, and open button.
   const logoUrl = getLogoUrl(url);
 
   return (
@@ -45,11 +49,14 @@ function WebAppCard({ label, url, highlight }) {
 }
 
 export default function WebApps() {
+  // Load teacher-edited web app links from Flask/SQLite.
   const [searchParams] = useSearchParams();
+  // The navbar search passes this word in the URL.
   const highlight = searchParams.get("highlight") || "";
   const [webApps, setWebApps] = useState(() => getStoredWebAppLinks());
 
   useEffect(() => {
+    // Replace the default links with saved links if teachers have edited them.
     loadStoredWebAppLinks().then(setWebApps);
   }, []);
 
@@ -66,6 +73,7 @@ export default function WebApps() {
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {/* Each card is created from the shared web app link data. */}
           {webApps.map((app) => (
             <WebAppCard
               key={app.id}

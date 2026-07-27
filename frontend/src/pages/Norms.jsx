@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import HighlightText from "../components/HighlightText";
 
 export default function Norms() {
+  // Highlight words when the navbar search sends a query here.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
 
@@ -15,6 +16,7 @@ export default function Norms() {
 
       {/* Search Bar */}
       <div className="mb-6">
+        {/* This search input is a placeholder for the future searchable norms feature. */}
         <input
           type="text"
           placeholder="Search school norms..."
@@ -42,6 +44,7 @@ export default function Norms() {
         >
           <div className="space-y-2">
 
+            {/* Later these buttons can filter real norms loaded from Flask. */}
             <button className="w-full border rounded-md py-2 hover:bg-gray-100">
               <HighlightText text="Attendance" highlight={highlight} />
             </button>
@@ -74,6 +77,7 @@ export default function Norms() {
           title="Attendance"
           className="col-span-9"
         >
+          {/* Placeholder content until the school norms API/database is added. */}
           <h2 className="text-2xl font-semibold mb-4">
             <HighlightText text="Attendance Expectations" highlight={highlight} />
           </h2>

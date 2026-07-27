@@ -2,6 +2,7 @@ import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
 
+// Shared styling for each navbar link, including the active page state.
 const navLinkClass = ({ isActive }) =>
   `
     rounded-lg
@@ -23,6 +24,8 @@ const navLinkClass = ({ isActive }) =>
     }
   `;
 
+// Simple keyword map that sends searches to the most likely page.
+// More specific pages are near the top so they win before broader words.
 const searchRoutes = [
   {
     path: "/careers",
@@ -55,6 +58,7 @@ export default function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
 
   function handleSearchSubmit(event) {
+    // When Enter is pressed, choose a page and pass the search word as a highlight.
     event.preventDefault();
 
     const trimmedSearchTerm = searchTerm.trim().toLowerCase();
@@ -65,9 +69,11 @@ export default function Navbar() {
 
     const matchingRoute =
       searchRoutes.find((route) =>
+        // If the search text contains any keyword, that page is chosen.
         route.keywords.some((keyword) => trimmedSearchTerm.includes(keyword)),
       ) || searchRoutes[0];
 
+    // The highlight query lets the destination page mark matching words.
     navigate(`${matchingRoute.path}?highlight=${encodeURIComponent(trimmedSearchTerm)}`);
     setSearchTerm("");
   }

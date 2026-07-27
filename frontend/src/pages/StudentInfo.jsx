@@ -8,18 +8,21 @@ import {
 } from "../data/studentNetData";
 
 const nceaGradeOptions = [
+  // Each NCEA grade has a point value for GPA/rank score calculations.
   { label: "Achieved", value: "achieved", points: 2 },
   { label: "Merit", value: "merit", points: 3 },
   { label: "Excellence", value: "excellence", points: 4 },
 ];
 
 const startingCreditEntries = [
+  // Start with three rows, but the calculations work from whatever rows are filled in.
   { id: 1, credits: "", grade: "" },
   { id: 2, credits: "", grade: "" },
   { id: 3, credits: "", grade: "" },
 ];
 
 function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
+  // One row where students enter credits and choose a grade.
   return (
     <div className="grid h-16 grid-cols-[1fr_13rem] items-center rounded-lg border border-[#F2901D] bg-white">
       <input
@@ -78,17 +81,21 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
 }
 
 function CalculatorPanel({ title, calculatorType, highlight }) {
+  // Reusable calculator panel for GPA and rank score.
   const [creditEntries, setCreditEntries] = useState(startingCreditEntries);
 
   const calculatorResult = useMemo(() => {
+    // Recalculate the result whenever credits or grades change.
     const completedCreditEntries = creditEntries
       .map((creditEntry) => {
+        // Convert the form text into numbers before doing maths.
         const credits = Number(creditEntry.credits);
         const grade = nceaGradeOptions.find(
           (option) => option.value === creditEntry.grade,
         );
 
         if (!credits || !grade) {
+          // Ignore rows that are not finished yet.
           return null;
         }
 
@@ -100,6 +107,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
       .filter(Boolean);
 
     if (calculatorType === "rankScore") {
+      // Rank score counts the best 80 credits, with Excellence worth the most.
       let remainingCredits = 80;
       const bestCreditTotal = completedCreditEntries
         .sort(
@@ -112,6 +120,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
           }
 
           const creditsToCount = Math.min(creditEntry.credits, remainingCredits);
+          // Subtract credits so only the best 80 are counted.
           remainingCredits -= creditsToCount;
 
           return total + creditsToCount * creditEntry.points;
@@ -129,6 +138,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
     );
 
     if (!totalCreditsAndPoints.credits) {
+      // Avoid dividing by zero before the student enters any credits.
       return "0.00";
     }
 
@@ -138,6 +148,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
   }, [creditEntries, calculatorType]);
 
   function updateCreditEntry(creditEntryId, field, value) {
+    // Update only the row that the student changed.
     setCreditEntries((currentCreditEntries) =>
       currentCreditEntries.map((creditEntry) =>
         creditEntry.id === creditEntryId
@@ -173,7 +184,9 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
 }
 
 function InfoCard({ label, url, highlight }) {
+  // Bottom Student Info card, optionally linking to an external resource.
   const hasLink = Boolean(url);
+  // If there is no URL yet, render a disabled button instead of a broken link.
   const MoreInfoButton = hasLink ? "a" : "button";
 
   return (
@@ -219,12 +232,14 @@ function InfoCard({ label, url, highlight }) {
 }
 
 export default function StudentInfo() {
+  // Load teacher-edited bottom links from Flask/SQLite.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
   const [studentInfoLinks] = useState(() => getStoredStudentInfoLinks());
   const [savedStudentInfoLinks, setSavedStudentInfoLinks] = useState(studentInfoLinks);
 
   useEffect(() => {
+    // Load the teacher-edited bottom cards after the first render.
     loadStoredStudentInfoLinks().then(setSavedStudentInfoLinks);
   }, []);
 
@@ -246,6 +261,7 @@ export default function StudentInfo() {
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {/* Bottom cards are editable from the Teacher Panel. */}
           {savedStudentInfoLinks.map((card) => (
             <InfoCard
               key={card.id}
