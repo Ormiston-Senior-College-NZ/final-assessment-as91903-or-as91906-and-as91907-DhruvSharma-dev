@@ -45,11 +45,11 @@ export default function TeacherLogin() {
   }
 
   return (
-    <main className="min-h-screen bg-[#404040] px-4 py-8">
+    <main className="min-h-screen bg-[#404040] px-3 py-6 sm:px-4 sm:py-8">
       {/* Blurred background keeps the login modal visually connected to the panel. */}
       <div className="absolute inset-0 overflow-hidden opacity-45 blur-sm">
         <div className="mx-auto mt-4 max-w-7xl rounded-xl border border-[#F2901D] bg-white p-4">
-          <div className="grid grid-cols-[16rem_1fr] gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-[16rem_1fr]">
             <aside className="min-h-150 rounded-lg border border-[#F2901D] bg-white p-4" />
             <section className="min-h-150 rounded-lg border border-[#F2901D] bg-white p-4" />
           </div>
@@ -60,7 +60,7 @@ export default function TeacherLogin() {
         {/* Login form displayed above the blurred panel background. */}
         <form
           onSubmit={handleSubmit}
-          className="relative w-full max-w-3xl rounded-xl border border-[#F2901D] bg-white px-12 py-10 shadow-2xl"
+          className="relative w-full max-w-3xl rounded-xl border border-[#F2901D] bg-white px-5 py-8 shadow-2xl sm:px-12 sm:py-10"
         >
           <Link
             to="/"
@@ -126,7 +126,7 @@ export default function TeacherLogin() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-md bg-[#F2901D] px-18 py-3 text-sm font-semibold text-white transition hover:bg-[#d87d11] focus:outline-none focus:ring-2 focus:ring-[#F2901D] focus:ring-offset-2"
+            className="w-full rounded-md bg-[#F2901D] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#d87d11] focus:outline-none focus:ring-2 focus:ring-[#F2901D] focus:ring-offset-2 sm:w-auto sm:px-18"
             >
               {isSubmitting ? "Logging in..." : "Login ->"}
             </button>

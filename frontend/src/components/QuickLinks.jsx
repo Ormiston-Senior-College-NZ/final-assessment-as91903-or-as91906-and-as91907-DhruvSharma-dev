@@ -5,9 +5,9 @@ import { getStoredQuickLinks, loadStoredQuickLinks } from "../data/studentNetDat
 // Shared style for internal and external quick link buttons.
 const quickLinkClass = `
   flex
-  h-11
-  min-w-36
-  flex-1
+  min-h-10
+  min-w-[8.5rem]
+  shrink-0
   items-center
   justify-center
   rounded-md
@@ -20,6 +20,8 @@ const quickLinkClass = `
   transition
   hover:bg-gray-50
   sm:min-w-44
+  sm:min-h-11
+  sm:flex-1
   sm:px-5
   sm:text-sm
 `;
@@ -33,7 +35,7 @@ export default function QuickLinks() {
   }, []);
 
   return (
-    <div className="fixed bottom-3 left-0 right-0 z-50 px-3 sm:bottom-4 sm:px-6">
+    <div className="fixed bottom-2 left-0 right-0 z-50 px-2 sm:bottom-4 sm:px-6">
       <div
         className="
           relative
@@ -44,13 +46,13 @@ export default function QuickLinks() {
           shadow-[0_-18px_45px_rgba(0,0,0,0.45)]
           border
           border-[#C49A00]
-          px-3
+          px-2
           py-2
           sm:px-4
           sm:py-3
         "
       >
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="flex flex-nowrap justify-start gap-1.5 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:gap-2 sm:overflow-visible sm:pb-0">
 
           {quickLinks.map((quickLink) =>
             quickLink.isInternal ? (

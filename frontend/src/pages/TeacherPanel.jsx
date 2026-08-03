@@ -145,7 +145,7 @@ function PlaceholderPanel({ title }) {
 function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave, onClear, onDelete }) {
   // Reusable editor for Quick Links, Student Info links, and Web App links.
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
       <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h3 className="text-lg font-bold text-gray-950">
@@ -203,7 +203,7 @@ function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave
           />
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-3">
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <button
             type="submit"
             className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
@@ -637,14 +637,14 @@ export default function TeacherPanel() {
   }
 
   return (
-    <main className="min-h-screen bg-[#404040] p-5">
-      <section className="grid min-h-[calc(100vh-2.5rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-3 text-base lg:grid-cols-[17rem_1fr]">
+    <main className="min-h-screen bg-[#404040] p-2 sm:p-5">
+      <section className="grid min-h-[calc(100vh-1rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-2 text-base sm:min-h-[calc(100vh-2.5rem)] sm:p-3 lg:grid-cols-[15rem_1fr] xl:grid-cols-[17rem_1fr]">
         <aside className="rounded-lg border border-[#F2901D] bg-white p-3">
-          <h1 className="mb-2 text-2xl font-bold text-gray-950">
+          <h1 className="mb-2 text-xl font-bold text-gray-950 sm:text-2xl">
             Menu:
           </h1>
 
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:block lg:space-y-3">
             {menuSections.map((section) => (
               <div key={section.heading}>
                 <h2 className="mb-1 text-base font-medium text-gray-950">
@@ -680,10 +680,10 @@ export default function TeacherPanel() {
           </div>
         </aside>
 
-        <section className="rounded-lg border border-[#F2901D] bg-white p-4">
+        <section className="min-w-0 rounded-lg border border-[#F2901D] bg-white p-3 sm:p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-2xl font-bold text-gray-950">
+              <h2 className="text-xl font-bold text-gray-950 sm:text-2xl">
                 Edit:
               </h2>
               <p className="text-sm font-medium text-[#F2901D]">
@@ -694,7 +694,7 @@ export default function TeacherPanel() {
             <button
               type="button"
               onClick={handleLogout}
-              className="rounded-full border border-[#F2901D] px-8 py-2 text-sm font-semibold text-gray-950 transition hover:bg-[#fff5e9]"
+              className="rounded-full border border-[#F2901D] px-5 py-2 text-sm font-semibold text-gray-950 transition hover:bg-[#fff5e9] sm:px-8"
             >
               Logout
             </button>
@@ -702,7 +702,7 @@ export default function TeacherPanel() {
 
           {/* Subject editor is reused for Level 1, Level 2, Level 3, and Scholarships. */}
           {isSubjectEditor && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
@@ -767,7 +767,7 @@ export default function TeacherPanel() {
                   />
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
                     type="submit"
                     className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
@@ -799,7 +799,7 @@ export default function TeacherPanel() {
 
           {/* This editor controls the "What's on this week?" card on the Home page. */}
           {activeEditor === "week" && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
@@ -874,7 +874,7 @@ export default function TeacherPanel() {
                   />
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
                     type="submit"
                     className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
@@ -906,7 +906,7 @@ export default function TeacherPanel() {
 
           {/* This editor controls the Announcements card on the Home page. */}
           {activeEditor === "announcements" && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[22rem_1fr]">
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
               <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
@@ -971,7 +971,7 @@ export default function TeacherPanel() {
                   />
                 </div>
 
-                <div className="mt-5 flex flex-wrap gap-3">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
                     type="submit"
                     className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"

@@ -24,7 +24,7 @@ const startingCreditEntries = [
 function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
   // One row where students enter credits and choose a grade.
   return (
-    <div className="grid h-16 grid-cols-[1fr_13rem] items-center rounded-lg border border-[#F2901D] bg-white">
+    <div className="grid min-h-16 grid-cols-1 items-center rounded-lg border border-[#F2901D] bg-white sm:grid-cols-[1fr_13rem]">
       <input
         type="number"
         min="0"
@@ -40,7 +40,7 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
           w-full
           rounded-md
           px-3
-          text-lg
+          text-base
           text-[#F2901D]
           outline-none
           placeholder:text-[#F2901D]
@@ -61,7 +61,7 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
           border-[#F2901D]
           bg-white
           px-3
-          text-lg
+          text-base
           text-[#F2901D]
           outline-none
         "
@@ -159,13 +159,13 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
   }
 
   return (
-    <section className="min-h-136 rounded-lg border border-[#F2901D] bg-white p-6">
-      <h1 className="text-2xl font-semibold text-gray-950">
+    <section className="min-h-104 rounded-lg border border-[#F2901D] bg-white p-4 sm:min-h-136 sm:p-6">
+      <h1 className="text-xl font-semibold text-gray-950 sm:text-2xl">
         <HighlightText text={title} highlight={highlight} />
       </h1>
 
-      <div className="mt-18 flex flex-col items-center">
-        <p className="text-7xl font-normal leading-none text-black">
+      <div className="mt-10 flex flex-col items-center sm:mt-18">
+        <p className="text-5xl font-normal leading-none text-black sm:text-7xl">
           {calculatorResult}
         </p>
 
@@ -193,8 +193,9 @@ function InfoCard({ label, url, highlight }) {
     <article
       className="
         flex
+        flex-col
         min-h-18
-        items-center
+        items-stretch
         justify-between
         gap-4
         rounded-lg
@@ -203,9 +204,11 @@ function InfoCard({ label, url, highlight }) {
         bg-white
         px-6
         py-3
+        sm:flex-row
+        sm:items-center
       "
     >
-      <h2 className="text-xl font-medium text-gray-950">
+      <h2 className="text-lg font-medium text-gray-950 sm:text-xl">
         <HighlightText text={label} highlight={highlight} />
       </h2>
 
@@ -219,6 +222,7 @@ function InfoCard({ label, url, highlight }) {
           rounded-lg
           px-5
           py-3
+          text-center
           text-base
           font-semibold
           text-white

@@ -63,13 +63,13 @@ export default function Home() {
 
   return (
     <Layout>
-      <section className="space-y-4">
+      <section className="space-y-3 sm:space-y-4">
         {/* Top dashboard row: week notices, calendar, and sheet options. */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
 
           <DashboardCard
             title="What's on this week?"
-            className="min-h-64 lg:col-span-3"
+            className="lg:col-span-3"
           >
             {/* These weekly items are edited from the Teacher Panel. */}
             <div className="space-y-3">
@@ -101,7 +101,7 @@ export default function Home() {
 
           <DashboardCard
             title="2026 Event Calendar"
-            className="min-h-112 lg:col-span-7"
+            className="lg:col-span-7"
           >
             <div className="overflow-hidden rounded-md border border-[#F2901D]/40 bg-white">
               {/* The restricted Google Sheet is embedded so OSC users can view it after logging in. */}
@@ -109,7 +109,7 @@ export default function Home() {
                 key={calendarFrameKey}
                 title="OSC 2026 Event Calendar"
                 src={eventCalendarEmbedUrl}
-                className="h-88 w-full"
+                className="h-64 w-full sm:h-88"
               />
             </div>
 
@@ -125,9 +125,9 @@ export default function Home() {
 
           <DashboardCard
             title="Sheet Options"
-            className="min-h-112 lg:col-span-2"
+            className="min-h-0 lg:col-span-2 lg:min-h-112"
           >
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:grid-cols-1">
               <a
                 href={eventCalendarViewUrl}
                 target="_blank"
@@ -145,7 +145,7 @@ export default function Home() {
                 Refresh
               </button>
 
-              <div className="rounded-md border border-[#F2901D]/40 bg-[#fff8ec] p-3 text-xs leading-5 text-gray-700">
+              <div className="rounded-md border border-[#F2901D]/40 bg-[#fff8ec] p-3 text-center text-xs leading-5 text-gray-700 lg:text-left">
                 OSC Google login required.
               </div>
             </div>
@@ -154,18 +154,18 @@ export default function Home() {
         </div>
 
         {/* Bottom dashboard row: school map and announcements. */}
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
 
           <DashboardCard
             title="Map of School"
-            className="min-h-96 lg:col-span-8"
+            className="lg:col-span-8"
           >
-            <div className="flex min-h-76 flex-col items-center justify-center rounded-md bg-[#404040] px-4 py-6 text-white">
-              <h3 className="mb-5 text-3xl font-bold">
+            <div className="flex flex-col items-center justify-center rounded-md bg-[#404040] px-3 py-5 text-white sm:min-h-76 sm:px-4 sm:py-6">
+              <h3 className="mb-4 text-2xl font-bold sm:mb-5 sm:text-3xl">
                 Map of School
               </h3>
 
-              <div className="grid w-full max-w-4xl grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <div className="grid w-full max-w-4xl grid-cols-1 items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
                 {/* Faded side previews show there are more maps to browse. */}
                 <img
                   src={schoolMaps[
@@ -175,12 +175,12 @@ export default function Home() {
                   className="hidden h-36 w-full rounded-md border border-white/20 object-cover opacity-45 sm:block"
                 />
 
-                <div className="relative w-[min(100%,34rem)] overflow-hidden rounded-md border border-[#F2901D] bg-white text-gray-950 shadow-lg">
-                  <div className="mb-3 flex items-center justify-between">
-                    <p className="px-4 pt-3 text-sm font-bold text-[#F2901D]">
+                <div className="relative w-full overflow-hidden rounded-md border border-[#F2901D] bg-white text-gray-950 shadow-lg sm:w-[min(100%,34rem)]">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="px-3 pt-3 text-sm font-bold text-[#F2901D] sm:px-4">
                       {activeMap.title}
                     </p>
-                    <p className="px-4 pt-3 text-xs font-semibold text-gray-500">
+                    <p className="shrink-0 px-3 pt-3 text-xs font-semibold text-gray-500 sm:px-4">
                       {activeMapIndex + 1}/{schoolMaps.length}
                     </p>
                   </div>
@@ -188,7 +188,7 @@ export default function Home() {
                   <img
                     src={activeMap.image}
                     alt={`${activeMap.title} school map`}
-                    className="h-56 w-full object-contain px-3 pb-3"
+                    className="h-48 w-full object-contain px-2 pb-3 sm:h-56 sm:px-3"
                   />
                 </div>
 
@@ -226,7 +226,7 @@ export default function Home() {
 
           <DashboardCard
             title="Announcements"
-            className="min-h-96 lg:col-span-4"
+            className="lg:col-span-4"
           >
             {/* Announcements are loaded from the same shared content system as week items. */}
             <div className="space-y-3">

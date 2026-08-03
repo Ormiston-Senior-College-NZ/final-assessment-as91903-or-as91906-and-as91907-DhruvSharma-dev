@@ -7,9 +7,11 @@ const navLinkClass = ({ isActive }) =>
   `
     rounded-lg
     px-3
-    py-2
+    py-1.5
     text-sm
     sm:text-base
+    md:px-3
+    md:py-2
     xl:px-4
     xl:py-2.5
     xl:text-lg
@@ -79,7 +81,7 @@ export default function Navbar() {
   }
 
   return (
-    <div className="fixed left-0 right-0 top-3 z-50 px-3 sm:px-6">
+    <div className="fixed left-0 right-0 top-2 z-50 px-2 sm:top-3 sm:px-6">
       <nav
         className="
           relative
@@ -90,8 +92,10 @@ export default function Navbar() {
           shadow-[0_18px_45px_rgba(0,0,0,0.45)]
           min-h-16
           px-3
-          py-3
-          sm:px-6
+          py-2
+          sm:px-4
+          sm:py-3
+          lg:px-6
           flex
           flex-wrap
           items-center
@@ -102,16 +106,16 @@ export default function Navbar() {
         "
       >
         {/* Logo */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <img
             src={logo}
             alt="Ormiston Senior College StudentNET Logo"
-            className="h-10 w-auto object-contain sm:h-12"
+            className="h-8 w-auto object-contain sm:h-10 lg:h-12"
           />
         </div>
 
         {/* Navigation */}
-        <div className="order-3 flex w-full items-center gap-2 overflow-x-auto pb-1 sm:gap-3 xl:order-0 xl:w-auto xl:flex-1 xl:justify-center xl:gap-4 xl:overflow-visible xl:pb-0">
+        <div className="order-3 flex w-full items-center gap-2 overflow-x-auto pb-1 sm:gap-3 lg:order-0 lg:w-auto lg:flex-1 lg:justify-center xl:gap-4 xl:overflow-visible xl:pb-0">
           <NavLink
             to="/"
             className={navLinkClass}
@@ -149,26 +153,28 @@ export default function Navbar() {
         </div>
 
         {/* Search */}
-        <form onSubmit={handleSearchSubmit}>
+        <form
+          onSubmit={handleSearchSubmit}
+          className="min-w-0 flex-1 sm:flex-none"
+        >
           <input
             type="search"
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.target.value)}
             placeholder="Search..."
             className="
-              w-40
-              shrink-0
+              w-full
+              sm:w-56
               border
               border-gray-300
               rounded-lg
               px-3
-              py-2
+              py-2.5
               text-sm
               focus:outline-none
               focus:ring-2
               focus:ring-[#F2901D]
               focus:border-[#F2901D]
-              sm:w-56
             "
           />
         </form>

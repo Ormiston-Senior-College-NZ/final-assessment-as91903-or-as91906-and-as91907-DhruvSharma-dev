@@ -10,7 +10,7 @@ export default function Norms() {
 
   return (
     <Layout>
-      <h1 className="text-4xl font-bold mb-6">
+      <h1 className="mb-6 text-3xl font-bold text-white sm:text-4xl">
         <HighlightText text="School Norms" highlight={highlight} />
       </h1>
 
@@ -35,12 +35,12 @@ export default function Norms() {
         />
       </div>
 
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
 
         {/* Categories */}
         <DashboardCard
           title="Categories"
-          className="col-span-3"
+          className="lg:col-span-3"
         >
           <div className="space-y-2">
 
@@ -75,7 +75,7 @@ export default function Norms() {
         {/* Selected Norm */}
         <DashboardCard
           title="Attendance"
-          className="col-span-9"
+          className="lg:col-span-9"
         >
           {/* Placeholder content until the school norms API/database is added. */}
           <h2 className="text-2xl font-semibold mb-4">

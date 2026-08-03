@@ -11,11 +11,12 @@ export default function DashboardCard({
         border
         border-[#F2901D]
         rounded-lg
-        p-4
+        p-3
+        sm:p-4
         ${className}
       `}
     >
-      <h2 className="font-semibold text-xl mb-3">
+      <h2 className="mb-3 text-lg font-semibold sm:text-xl">
         {title}
       </h2>
 

@@ -44,7 +44,7 @@ export default function Curriculum() {
   return (
     <Layout>
       <section className="space-y-6">
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {curriculumLevels.map((level) => (
             <button
               key={level.id}
@@ -53,7 +53,7 @@ export default function Curriculum() {
                 setActiveLevel(level.id);
                 setSelectedSubjectId("");
               }}
-              className={`min-w-56 rounded-md border border-[#F2901D] px-8 py-4 text-xl font-bold transition ${
+              className={`w-full rounded-md border border-[#F2901D] px-5 py-3 text-base font-bold transition sm:py-4 sm:text-xl ${
                 activeLevel === level.id
                   ? "bg-[#F2901D] text-white"
                   : "bg-white text-gray-950 hover:bg-[#fff5e9]"
@@ -102,7 +102,7 @@ export default function Curriculum() {
             </div>
           </aside>
 
-          <article className="min-h-144 rounded-lg border border-[#F2901D] bg-white p-5">
+          <article className="min-h-96 rounded-lg border border-[#F2901D] bg-white p-4 sm:min-h-144 sm:p-5">
             <h2 className="mb-5 text-xl font-bold text-gray-950">
               More Info:
             </h2>
@@ -114,12 +114,12 @@ export default function Curriculum() {
                     {curriculumLevels.find((level) => level.id === activeLevel)?.label}
                   </p>
 
-                  <h3 className="mt-1 text-3xl font-bold text-gray-950">
+                  <h3 className="mt-1 text-2xl font-bold text-gray-950 sm:text-3xl">
                     <HighlightText text={selectedSubject.name} highlight={highlight} />
                   </h3>
                 </div>
 
-                <p className="text-lg leading-8 text-gray-700">
+                <p className="text-base leading-7 text-gray-700 sm:text-lg sm:leading-8">
                   <HighlightText text={selectedSubject.description} highlight={highlight} />
                 </p>
 
