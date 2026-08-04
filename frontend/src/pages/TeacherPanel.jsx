@@ -665,10 +665,10 @@ export default function TeacherPanel() {
                         setCareersSupportForm(careersSupport);
                         clearLinkForm();
                       }}
-                      className={`w-full rounded-md border border-[#F2901D] px-3 py-2 text-sm transition hover:bg-[#fff5e9] ${
+                      className={`w-full rounded-md border border-[#F2901D] px-3 py-2 text-sm font-medium transition ${
                         activeEditor === item.id
-                          ? "bg-[#F2901D] text-white hover:bg-[#d87d11]"
-                          : "bg-white text-gray-950"
+                          ? "bg-[#F2901D] text-white shadow-sm"
+                          : "bg-white text-gray-950 hover:bg-[#fff8ec]"
                       }`}
                     >
                       {item.label}
