@@ -9,7 +9,7 @@ export default function Layout({ children }) {
       <Navbar />
 
       {/* Page content sits between the fixed navbar and quick links bar. */}
-      <main className="mx-auto max-w-440 px-3 pt-[8.5rem] pb-24 sm:px-6 sm:pt-40 sm:pb-52 lg:pt-32 xl:pt-28 xl:pb-40">
+      <main className="mx-auto max-w-440 px-3 pt-24 pb-24 sm:px-6 sm:pt-28 sm:pb-52 lg:pt-32 xl:pt-28 xl:pb-40">
         {children}
       </main>
 
