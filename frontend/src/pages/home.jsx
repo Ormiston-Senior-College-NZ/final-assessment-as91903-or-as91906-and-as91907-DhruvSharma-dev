@@ -39,6 +39,7 @@ export default function Home() {
   const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
   const [calendarFrameKey, setCalendarFrameKey] = useState(0);
   const [activeMapIndex, setActiveMapIndex] = useState(0);
+  const [isMapPopupOpen, setIsMapPopupOpen] = useState(false);
   const activeMap = schoolMaps[activeMapIndex];
 
   function showPreviousMap() {
@@ -53,6 +54,11 @@ export default function Home() {
     setActiveMapIndex((currentIndex) =>
       currentIndex === schoolMaps.length - 1 ? 0 : currentIndex + 1,
     );
+  }
+
+  function closeMapPopup() {
+    // Close the larger map popup.
+    setIsMapPopupOpen(false);
   }
 
   useEffect(() => {
@@ -175,7 +181,12 @@ export default function Home() {
                   className="hidden h-36 w-full rounded-md border border-white/20 object-cover opacity-45 sm:block"
                 />
 
-                <div className="relative w-full overflow-hidden rounded-md border border-[#F2901D] bg-white text-gray-950 shadow-lg sm:w-[min(100%,34rem)]">
+                <button
+                  type="button"
+                  onClick={() => setIsMapPopupOpen(true)}
+                  className="relative w-full overflow-hidden rounded-md border border-[#F2901D] bg-white text-left text-gray-950 shadow-lg transition hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-[#F2901D] focus:ring-offset-2 focus:ring-offset-[#404040] sm:w-[min(100%,34rem)]"
+                  aria-label={`Open larger view of ${activeMap.title}`}
+                >
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <p className="px-3 pt-3 text-sm font-bold text-[#F2901D] sm:px-4">
                       {activeMap.title}
@@ -190,7 +201,7 @@ export default function Home() {
                     alt={`${activeMap.title} school map`}
                     className="h-48 w-full object-contain px-2 pb-3 sm:h-56 sm:px-3"
                   />
-                </div>
+                </button>
 
                 <img
                   src={schoolMaps[
@@ -278,6 +289,43 @@ export default function Home() {
           </Link>
         </div>
       </section>
+
+      {isMapPopupOpen && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/70 px-3 py-6">
+          <button
+            type="button"
+            onClick={closeMapPopup}
+            className="absolute inset-0"
+            aria-label="Close map popup background"
+          />
+
+          <div className="relative z-10 max-h-full w-full max-w-6xl overflow-hidden rounded-lg border border-[#F2901D] bg-white shadow-2xl">
+            <div className="flex items-center justify-between gap-3 border-b border-[#F2901D]/30 px-4 py-3">
+              <h2 className="text-lg font-bold text-gray-950">
+                {activeMap.title}
+              </h2>
+
+              <button
+                type="button"
+                onClick={closeMapPopup}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-[#F2901D] text-xl font-bold text-gray-950 transition hover:bg-[#fff8ec]"
+                aria-label="Close map popup"
+              >
+                X
+              </button>
+            </div>
+
+            <div className="max-h-[80vh] overflow-auto bg-white p-3">
+              <img
+                src={activeMap.image}
+                alt={`${activeMap.title} school map enlarged`}
+                className="mx-auto max-h-[74vh] w-full object-contain"
+              />
+            </div>
+          </div>
+
+        </div>
+      )}
 
     </Layout>
   );

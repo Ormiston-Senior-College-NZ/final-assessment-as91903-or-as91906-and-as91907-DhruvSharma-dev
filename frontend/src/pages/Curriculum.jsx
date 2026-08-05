@@ -119,7 +119,7 @@ export default function Curriculum() {
                   </h3>
                 </div>
 
-                <p className="text-base leading-7 text-gray-700 sm:text-lg sm:leading-8">
+                <p className="whitespace-pre-wrap wrap-break-word text-base leading-7 text-gray-700 sm:text-lg sm:leading-8">
                   <HighlightText text={selectedSubject.description} highlight={highlight} />
                 </p>
 
@@ -127,7 +127,7 @@ export default function Curriculum() {
                   <h4 className="text-base font-bold text-gray-950">
                     Pathway
                   </h4>
-                  <p className="mt-2 leading-7 text-gray-700">
+                  <p className="mt-2 whitespace-pre-wrap wrap-break-word leading-7 text-gray-700">
                     <HighlightText text={selectedSubject.pathway} highlight={highlight} />
                   </p>
                 </div>

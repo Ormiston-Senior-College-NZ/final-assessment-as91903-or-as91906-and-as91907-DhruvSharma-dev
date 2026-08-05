@@ -125,7 +125,7 @@ export default function Careers() {
             <HighlightText text={careersSupport.title} highlight={highlight} />
           </h1>
 
-          <p className="mt-3 max-w-5xl text-lg leading-8 text-gray-700">
+          <p className="mt-3 max-w-5xl whitespace-pre-wrap break-words text-lg leading-8 text-gray-700">
             <HighlightText text={careersSupport.message} highlight={highlight} />
           </p>
         </article>

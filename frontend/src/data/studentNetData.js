@@ -93,7 +93,7 @@ export const defaultWeekItems = [
   {
     id: "week-assembly",
     day: "Monday",
-    title: "Whanau assembly",
+    title: "Mokoroa assembly",
     time: "9:00 AM",
     location: "Theatre",
   },
@@ -123,7 +123,7 @@ export const defaultAnnouncements = [
   },
   {
     id: "announcement-reminder",
-    title: "Bring your device",
+    title: "UEG Exams",
     message: "Students should bring a charged device to school each day.",
     date: "This week",
   },
