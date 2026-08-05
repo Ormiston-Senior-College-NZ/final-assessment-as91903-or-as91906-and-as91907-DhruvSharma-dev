@@ -43,7 +43,7 @@ export default function Curriculum() {
 
   return (
     <Layout>
-      <section className="space-y-6">
+      <section className="space-y-4 lg:h-[calc(100vh-13rem)] lg:overflow-hidden">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {curriculumLevels.map((level) => (
             <button
@@ -64,8 +64,8 @@ export default function Curriculum() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[20rem_1fr]">
-          <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+        <div className="grid grid-cols-1 gap-4 lg:h-[calc(100%-4.75rem)] lg:grid-cols-[20rem_1fr] lg:overflow-hidden">
+          <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
             <h1 className="mb-4 text-xl font-bold text-gray-950">
               Subject:
             </h1>
@@ -78,7 +78,7 @@ export default function Curriculum() {
               className="mb-3 w-full rounded-md border border-[#F2901D] px-3 py-3 text-base outline-none focus:ring-2 focus:ring-[#F2901D]"
             />
 
-            <div className="space-y-2">
+            <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {filteredSubjects.map((subject) => (
                 <button
                   key={subject.id}
@@ -102,7 +102,7 @@ export default function Curriculum() {
             </div>
           </aside>
 
-          <article className="min-h-96 rounded-lg border border-[#F2901D] bg-white p-4 sm:min-h-144 sm:p-5">
+          <article className="min-h-96 overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4 sm:min-h-144 sm:p-5 lg:min-h-0">
             <h2 className="mb-5 text-xl font-bold text-gray-950">
               More Info:
             </h2>

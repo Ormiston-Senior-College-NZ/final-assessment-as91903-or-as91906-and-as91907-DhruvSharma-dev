@@ -145,8 +145,8 @@ function PlaceholderPanel({ title }) {
 function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave, onClear, onDelete }) {
   // Reusable editor for Quick Links, Student Info links, and Web App links.
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
-      <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+    <div className="grid min-h-0 grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
+      <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h3 className="text-lg font-bold text-gray-950">
             Links
@@ -161,7 +161,7 @@ function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave
           </button>
         </div>
 
-        <div className="space-y-2">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {links.map((link) => (
             <button
               key={link.id}
@@ -181,7 +181,7 @@ function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave
 
       <form
         onSubmit={onSave}
-        className="rounded-lg border border-[#F2901D] bg-white p-4"
+        className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4"
       >
         <h3 className="mb-4 text-lg font-bold text-gray-950">
           {selectedId ? `Edit ${title}` : `Add ${title}`}
@@ -415,7 +415,7 @@ export default function TeacherPanel() {
 
     setSubjects(updatedSubjects);
     saveStoredSubjects(updatedSubjects);
-    setSelectedSubjectId(savedSubject.id);
+    clearSubjectForm();
   }
 
   function clearSubjectForm() {
@@ -637,9 +637,9 @@ export default function TeacherPanel() {
   }
 
   return (
-    <main className="min-h-screen bg-[#404040] p-2 sm:p-5">
-      <section className="grid min-h-[calc(100vh-1rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-2 text-base sm:min-h-[calc(100vh-2.5rem)] sm:p-3 lg:grid-cols-[15rem_1fr] xl:grid-cols-[17rem_1fr]">
-        <aside className="rounded-lg border border-[#F2901D] bg-white p-3">
+    <main className="min-h-screen bg-[#404040] p-2 sm:p-5 lg:h-screen lg:overflow-hidden">
+      <section className="grid min-h-[calc(100vh-1rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-2 text-base sm:min-h-[calc(100vh-2.5rem)] sm:p-3 lg:h-full lg:min-h-0 lg:grid-cols-[15rem_1fr] lg:overflow-hidden xl:grid-cols-[17rem_1fr]">
+        <aside className="rounded-lg border border-[#F2901D] bg-white p-3 lg:overflow-y-auto">
           <h1 className="mb-2 text-xl font-bold text-gray-950 sm:text-2xl">
             Menu:
           </h1>
@@ -680,8 +680,8 @@ export default function TeacherPanel() {
           </div>
         </aside>
 
-        <section className="min-w-0 rounded-lg border border-[#F2901D] bg-white p-3 sm:p-4">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <section className="min-w-0 rounded-lg border border-[#F2901D] bg-white p-3 sm:p-4 lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 lg:shrink-0">
             <div>
               <h2 className="text-xl font-bold text-gray-950 sm:text-2xl">
                 Edit:
@@ -702,8 +702,8 @@ export default function TeacherPanel() {
 
           {/* Subject editor is reused for Level 1, Level 2, Level 3, and Scholarships. */}
           {isSubjectEditor && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
-              <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+            <div className="grid min-h-0 grid-cols-1 gap-4 lg:flex-1 lg:overflow-hidden xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
+              <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
                     Subjects
@@ -718,7 +718,7 @@ export default function TeacherPanel() {
                   </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                   {activeSubjects.map((subject) => (
                     <button
                       key={subject.id}
@@ -738,7 +738,7 @@ export default function TeacherPanel() {
 
               <form
                 onSubmit={saveSubject}
-                className="rounded-lg border border-[#F2901D] bg-white p-4"
+                className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4"
               >
                 <h3 className="mb-4 text-lg font-bold text-gray-950">
                   {selectedSubjectId ? "Edit Subject" : "Add Subject"}
@@ -799,8 +799,8 @@ export default function TeacherPanel() {
 
           {/* This editor controls the "What's on this week?" card on the Home page. */}
           {activeEditor === "week" && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
-              <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+            <div className="grid min-h-0 grid-cols-1 gap-4 lg:flex-1 lg:overflow-hidden xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
+              <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
                     Week Items
@@ -815,7 +815,7 @@ export default function TeacherPanel() {
                   </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                   {weekItems.map((item) => (
                     <button
                       key={item.id}
@@ -838,7 +838,7 @@ export default function TeacherPanel() {
 
               <form
                 onSubmit={saveWeekItem}
-                className="rounded-lg border border-[#F2901D] bg-white p-4"
+                className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4"
               >
                 <h3 className="mb-4 text-lg font-bold text-gray-950">
                   {selectedWeekItemId ? "Edit Week Item" : "Add Week Item"}
@@ -906,8 +906,8 @@ export default function TeacherPanel() {
 
           {/* This editor controls the Announcements card on the Home page. */}
           {activeEditor === "announcements" && (
-            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
-              <aside className="rounded-lg border border-[#F2901D] bg-white p-4">
+            <div className="grid min-h-0 grid-cols-1 gap-4 lg:flex-1 lg:overflow-hidden xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
+              <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <h3 className="text-lg font-bold text-gray-950">
                     Announcements
@@ -922,7 +922,7 @@ export default function TeacherPanel() {
                   </button>
                 </div>
 
-                <div className="space-y-2">
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                   {announcements.map((announcement) => (
                     <button
                       key={announcement.id}
@@ -942,7 +942,7 @@ export default function TeacherPanel() {
 
               <form
                 onSubmit={saveAnnouncement}
-                className="rounded-lg border border-[#F2901D] bg-white p-4"
+                className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4"
               >
                 <h3 className="mb-4 text-lg font-bold text-gray-950">
                   {selectedAnnouncementId ? "Edit Announcement" : "Add Announcement"}
@@ -1005,7 +1005,7 @@ export default function TeacherPanel() {
           {activeEditor === "careers-support" && (
             <form
               onSubmit={saveCareersSupport}
-              className="rounded-lg border border-[#F2901D] bg-white p-4"
+              className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4 lg:flex-1"
             >
               <h3 className="mb-4 text-lg font-bold text-gray-950">
                 Edit Careers Support Section
