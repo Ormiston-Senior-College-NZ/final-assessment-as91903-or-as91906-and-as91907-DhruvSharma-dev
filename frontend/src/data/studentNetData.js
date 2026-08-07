@@ -131,7 +131,7 @@ export const defaultAnnouncements = [
 
 export const defaultQuickLinks = [
   // Default fixed bottom quick links.
-  { id: "norms", label: "Norms", url: "/norms", isInternal: true },
+  { id: "expectations", label: "Expectations", url: "/expectations", isInternal: true },
   { id: "kamar", label: "Kamar Portal", url: "https://ormiston.school.kiwi/" },
   {
     id: "wifi",
@@ -181,6 +181,31 @@ export const defaultCareersSupport = {
     "The Careers Department supports students with pathways, university planning, apprenticeships, scholarships, Gateway, and career decision making.",
 };
 
+export const defaultNorms = [
+  // Default school norms shown before teachers save custom norms.
+  {
+    id: "norm-attendance",
+    title: "Attendance Expectations",
+    category: "Attendance",
+    content:
+      "Students are expected to attend school each day and arrive to learning on time.",
+  },
+  {
+    id: "norm-uniform",
+    title: "Uniform",
+    category: "Uniform",
+    content:
+      "Students should wear the correct school uniform and present themselves respectfully.",
+  },
+  {
+    id: "norm-devices",
+    title: "Devices",
+    category: "Devices",
+    content:
+      "Students should bring a charged device and use it responsibly for learning.",
+  },
+];
+
 export const eventCalendarSheet = {
   // The secure Google Sheet is embedded instead of fetched as raw data.
   spreadsheetId: "173F-7IVXVgB9K0Cfz_GAPs5iFL6sfYq3Pi0-Ulhq794",
@@ -199,6 +224,7 @@ const quickLinksStorageKey = "studentnet-quick-links";
 const studentInfoLinksStorageKey = "studentnet-student-info-links";
 const webAppLinksStorageKey = "studentnet-web-app-links";
 const careersSupportStorageKey = "studentnet-careers-support";
+const normsStorageKey = "studentnet-school-norms";
 
 function readStoredValue(key, fallbackValue) {
   // Read browser-saved content first so the UI has something to show immediately.
@@ -340,6 +366,18 @@ export function loadStoredCareersSupport() {
 
 export function saveStoredCareersSupport(content) {
   writeStoredValue(careersSupportStorageKey, content);
+}
+
+export function getStoredNorms() {
+  return readStoredValue(normsStorageKey, defaultNorms);
+}
+
+export function loadStoredNorms() {
+  return loadContentFromDatabase(normsStorageKey, getStoredNorms());
+}
+
+export function saveStoredNorms(norms) {
+  writeStoredValue(normsStorageKey, norms);
 }
 
 export function createId(prefix) {

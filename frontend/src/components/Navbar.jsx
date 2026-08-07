@@ -46,12 +46,16 @@ const searchRoutes = [
     keywords: ["web", "apps", "gmail", "classroom", "refseek", "myportfolio"],
   },
   {
-    path: "/norms",
-    keywords: ["norm", "norms", "attendance", "uniform", "behaviour", "devices", "exams"],
+    path: "/expectations",
+    keywords: ["expectation", "expectations", "norm", "norms", "attendance", "uniform", "behaviour", "devices", "exams"],
   },
   {
     path: "/",
     keywords: ["announcement", "announcements", "map", "calendar", "event", "week"],
+  },
+  {
+    path: "/expectations",
+    keywords: ["rules", "attendance"],
   },
 ];
 

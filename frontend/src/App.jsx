@@ -5,7 +5,7 @@ import StudentInfo from "./pages/StudentInfo";
 import Curriculum from "./pages/Curriculum";
 import Careers from "./pages/Careers";
 import WebApps from "./pages/WebApps";
-import Norms from "./pages/Norms";
+import Expectations from "./pages/Expectations";
 import TeacherLogin from "./pages/TeacherLogin";
 import TeacherPanel from "./pages/TeacherPanel";
 
@@ -19,7 +19,8 @@ function App() {
         <Route path="/curriculum" element={<Curriculum />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/web-apps" element={<WebApps />} />
-        <Route path="/norms" element={<Norms />} />
+        <Route path="/norms" element={<Expectations />} />
+        <Route path="/expectations" element={<Expectations />} />
         <Route path="/teacher-login" element={<TeacherLogin />} />
         <Route path="/teacher-panel" element={<TeacherPanel />} />
       </Routes>

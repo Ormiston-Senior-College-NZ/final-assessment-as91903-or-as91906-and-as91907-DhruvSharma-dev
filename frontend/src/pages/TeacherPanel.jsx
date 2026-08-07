@@ -5,6 +5,7 @@ import {
   curriculumLevels,
   getStoredCareersSupport,
   getStoredAnnouncements,
+  getStoredNorms,
   getStoredQuickLinks,
   getStoredSubjects,
   getStoredStudentInfoLinks,
@@ -12,6 +13,7 @@ import {
   getStoredWeekItems,
   loadStoredAnnouncements,
   loadStoredCareersSupport,
+  loadStoredNorms,
   loadStoredQuickLinks,
   loadStoredStudentInfoLinks,
   loadStoredSubjects,
@@ -19,6 +21,7 @@ import {
   loadStoredWeekItems,
   saveStoredAnnouncements,
   saveStoredCareersSupport,
+  saveStoredNorms,
   saveStoredQuickLinks,
   saveStoredSubjects,
   saveStoredStudentInfoLinks,
@@ -47,7 +50,7 @@ const menuSections = [
     ],
   },
   {
-    heading: "Web-Based Apps",
+    heading: "Web-Based Apps Page",
     items: [{ id: "apps", label: "App Links" }],
   },
   {
@@ -55,12 +58,15 @@ const menuSections = [
     items: [{ id: "careers-support", label: "Careers Support" }],
   },
   {
-    heading: "Student Info",
+    heading: "Student Info Page",
     items: [{ id: "student-info", label: "Bottom Links" }],
   },
   {
     heading: "Other",
-    items: [{ id: "quick-links", label: "Quick Links" }],
+    items: [
+      { id: "norms", label: "Expectations" },
+      { id: "quick-links", label: "Quick Links" },
+    ],
   },
 ];
 
@@ -84,6 +90,13 @@ const blankAnnouncementForm = {
   title: "",
   message: "",
   date: "",
+};
+
+// Empty form values used when adding a new school norm.
+const blankNormForm = {
+  title: "",
+  category: "",
+  content: "",
 };
 
 // Empty form values used when adding a new editable link.
@@ -242,6 +255,7 @@ export default function TeacherPanel() {
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
   const [announcements, setAnnouncements] = useState(() => getStoredAnnouncements());
+  const [norms, setNorms] = useState(() => getStoredNorms());
   const [careersSupport, setCareersSupport] = useState(() =>
     getStoredCareersSupport(),
   );
@@ -254,6 +268,8 @@ export default function TeacherPanel() {
   const [weekForm, setWeekForm] = useState(blankWeekForm);
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState("");
   const [announcementForm, setAnnouncementForm] = useState(blankAnnouncementForm);
+  const [selectedNormId, setSelectedNormId] = useState("");
+  const [normForm, setNormForm] = useState(blankNormForm);
   const [careersSupportForm, setCareersSupportForm] = useState(() =>
     getStoredCareersSupport(),
   );
@@ -272,6 +288,10 @@ export default function TeacherPanel() {
 
     if (activeEditor === "announcements") {
       return "Announcements";
+    }
+
+    if (activeEditor === "norms") {
+      return "Expectations";
     }
 
     if (activeEditor === "careers-support") {
@@ -320,6 +340,7 @@ export default function TeacherPanel() {
     loadStoredSubjects().then(setSubjects);
     loadStoredWeekItems().then(setWeekItems);
     loadStoredAnnouncements().then(setAnnouncements);
+    loadStoredNorms().then(setNorms);
     loadStoredCareersSupport().then((content) => {
       setCareersSupport(content);
       setCareersSupportForm(content);
@@ -358,6 +379,14 @@ export default function TeacherPanel() {
   function updateAnnouncementForm(field, value) {
     // Update one announcement form field.
     setAnnouncementForm((currentForm) => ({
+      ...currentForm,
+      [field]: value,
+    }));
+  }
+
+  function updateNormForm(field, value) {
+    // Update one school norm form field.
+    setNormForm((currentForm) => ({
       ...currentForm,
       [field]: value,
     }));
@@ -540,6 +569,55 @@ export default function TeacherPanel() {
     clearAnnouncementForm();
   }
 
+  function selectNorm(norm) {
+    // Fill the form with an existing norm.
+    setSelectedNormId(norm.id);
+    setNormForm({
+      title: norm.title,
+      category: norm.category,
+      content: norm.content,
+    });
+  }
+
+  function saveNorm(event) {
+    // Add or update an expectation shown on the Expectations page.
+    event.preventDefault();
+
+    if (!normForm.title.trim()) {
+      return;
+    }
+
+    const savedNorm = {
+      id: selectedNormId || createId("norm"),
+      title: normForm.title.trim(),
+      category: normForm.category.trim() || "General",
+      content: normForm.content.trim(),
+    };
+
+    const updatedNorms = selectedNormId
+      ? norms.map((norm) => (norm.id === selectedNormId ? savedNorm : norm))
+      : [...norms, savedNorm];
+
+    setNorms(updatedNorms);
+    saveStoredNorms(updatedNorms);
+    clearNormForm();
+  }
+
+  function clearNormForm() {
+    // Reset the school norm form.
+    setSelectedNormId("");
+    setNormForm(blankNormForm);
+  }
+
+  function deleteNorm(normId) {
+    // Remove one expectation from the Expectations page list.
+    const updatedNorms = norms.filter((norm) => norm.id !== normId);
+
+    setNorms(updatedNorms);
+    saveStoredNorms(updatedNorms);
+    clearNormForm();
+  }
+
   function saveCareersSupport(event) {
     // Save the text shown underneath the Careers staff cards.
     event.preventDefault();
@@ -662,6 +740,7 @@ export default function TeacherPanel() {
                         clearSubjectForm();
                         clearWeekForm();
                         clearAnnouncementForm();
+                        clearNormForm();
                         setCareersSupportForm(careersSupport);
                         clearLinkForm();
                       }}
@@ -1001,6 +1080,106 @@ export default function TeacherPanel() {
             </div>
           )}
 
+          {/* This editor controls the expectations shown on the Expectations page. */}
+          {activeEditor === "norms" && (
+            <div className="grid min-h-0 grid-cols-1 gap-4 lg:flex-1 lg:overflow-hidden xl:grid-cols-[20rem_1fr] 2xl:grid-cols-[22rem_1fr]">
+              <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-bold text-gray-950">
+                    Expectations
+                  </h3>
+
+                  <button
+                    type="button"
+                    onClick={clearNormForm}
+                    className="rounded-md bg-[#F2901D] px-3 py-2 text-xs font-semibold text-white hover:bg-[#d87d11]"
+                  >
+                    Add New
+                  </button>
+                </div>
+
+                <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+                  {norms.map((norm) => (
+                    <button
+                      key={norm.id}
+                      type="button"
+                      onClick={() => selectNorm(norm)}
+                      className={`w-full rounded-md border border-[#F2901D] px-3 py-3 text-left text-sm font-semibold transition ${
+                        selectedNormId === norm.id
+                          ? "bg-[#F2901D] text-white"
+                          : "bg-white text-gray-950 hover:bg-[#fff5e9]"
+                      }`}
+                    >
+                      <span className="block">{norm.title}</span>
+                      <span className="text-xs font-medium opacity-80">
+                        {norm.category}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </aside>
+
+              <form
+                onSubmit={saveNorm}
+                className="overflow-y-auto rounded-lg border border-[#F2901D] bg-white p-4"
+              >
+                <h3 className="mb-4 text-lg font-bold text-gray-950">
+                  {selectedNormId ? "Edit Expectation" : "Add Expectation"}
+                </h3>
+
+                <div className="space-y-4">
+                  <EditorInput
+                    label="Title"
+                    value={normForm.title}
+                    onChange={(value) => updateNormForm("title", value)}
+                    placeholder="Example: Attendance Expectations"
+                  />
+
+                  <EditorInput
+                    label="Category / Tab Name"
+                    value={normForm.category}
+                    onChange={(value) => updateNormForm("category", value)}
+                    placeholder="Example: Attendance"
+                  />
+
+                  <EditorTextarea
+                    label="Content"
+                    value={normForm.content}
+                    onChange={(value) => updateNormForm("content", value)}
+                    placeholder="Write the expectation..."
+                  />
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <button
+                    type="submit"
+                    className="rounded-md bg-[#F2901D] px-6 py-3 text-sm font-semibold text-white hover:bg-[#d87d11]"
+                  >
+                    Save Expectation
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={clearNormForm}
+                    className="rounded-md border border-[#F2901D] px-6 py-3 text-sm font-semibold text-gray-950 hover:bg-[#fff5e9]"
+                  >
+                    Clear
+                  </button>
+
+                  {selectedNormId && (
+                    <button
+                      type="button"
+                      onClick={() => deleteNorm(selectedNormId)}
+                      className="rounded-md border border-red-500 px-6 py-3 text-sm font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
+              </form>
+            </div>
+          )}
+
           {/* This editor controls the editable text section on the Careers page. */}
           {activeEditor === "careers-support" && (
             <form
@@ -1054,6 +1233,7 @@ export default function TeacherPanel() {
           {!isSubjectEditor &&
             activeEditor !== "week" &&
             activeEditor !== "announcements" &&
+            activeEditor !== "norms" &&
             activeEditor !== "careers-support" &&
             !["apps", "student-info", "quick-links"].includes(activeEditor) && (
             <PlaceholderPanel title={pageTitle} />
