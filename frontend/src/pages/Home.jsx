@@ -16,7 +16,7 @@ import mapTwo from "../assets/map-2.jpg";
 import mapThree from "../assets/map-3.jpg";
 
 const schoolMaps = [
-  // These images are shown in the Map of School carousel.
+  // The maps are kept together so the arrows can move between them.
   {
     title: "Main Building (Ground Floor)",
     image: mapOne,
@@ -32,7 +32,7 @@ const schoolMaps = [
 ];
 
 export default function Home() {
-  // Read the search word from the URL so matching dashboard text can be highlighted.
+  // Read the navbar search from the URL and highlight it on this page.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
   const [weekItems, setWeekItems] = useState(() => getStoredWeekItems());
@@ -43,26 +43,26 @@ export default function Home() {
   const activeMap = schoolMaps[activeMapIndex];
 
   function showPreviousMap() {
-    // Move to the previous map, looping back to the end if needed.
+    // Go back one map, or loop to the last one.
     setActiveMapIndex((currentIndex) =>
       currentIndex === 0 ? schoolMaps.length - 1 : currentIndex - 1,
     );
   }
 
   function showNextMap() {
-    // Move to the next map, looping back to the first map if needed.
+    // Go forward one map, or loop to the first one.
     setActiveMapIndex((currentIndex) =>
       currentIndex === schoolMaps.length - 1 ? 0 : currentIndex + 1,
     );
   }
 
   function closeMapPopup() {
-    // Close the larger map popup.
+    // Hide the large map view.
     setIsMapPopupOpen(false);
   }
 
   useEffect(() => {
-    // Load shared home page content from Flask/SQLite when the page opens.
+    // Get the latest notices saved by a teacher.
     loadStoredWeekItems().then(setWeekItems);
     loadStoredAnnouncements().then(setAnnouncements);
   }, []);
@@ -70,14 +70,14 @@ export default function Home() {
   return (
     <Layout>
       <section className="space-y-3 sm:space-y-4">
-        {/* Top dashboard row: week notices, calendar, and sheet options. */}
+        {/* The top row has this week's notices and calendar. */}
         <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
 
           <DashboardCard
             title="What's on this week?"
             className="lg:col-span-3"
           >
-            {/* These weekly items are edited from the Teacher Panel. */}
+            {/* Teachers can change these notices in their panel. */}
             <div className="space-y-3">
               {weekItems.map((item) => (
                 <article
@@ -110,7 +110,7 @@ export default function Home() {
             className="lg:col-span-7"
           >
             <div className="overflow-hidden rounded-md border border-[#F2901D]/40 bg-white">
-              {/* The restricted Google Sheet is embedded so OSC users can view it after logging in. */}
+              {/* Show the school calendar straight from Google Sheets. */}
               <iframe
                 key={calendarFrameKey}
                 title="OSC 2026 Event Calendar"
@@ -159,7 +159,7 @@ export default function Home() {
 
         </div>
 
-        {/* Bottom dashboard row: school map and announcements. */}
+        {/* The bottom row has school maps and announcements. */}
         <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
 
           <DashboardCard
@@ -172,7 +172,7 @@ export default function Home() {
               </h3>
 
               <div className="grid w-full max-w-4xl grid-cols-1 items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
-                {/* Faded side previews show there are more maps to browse. */}
+                {/* Side images give a preview of the other maps. */}
                 <img
                   src={schoolMaps[
                     activeMapIndex === 0 ? schoolMaps.length - 1 : activeMapIndex - 1
@@ -213,7 +213,7 @@ export default function Home() {
               </div>
 
               <div className="mt-4 flex gap-4">
-                {/* Arrow buttons change which map is shown in the centre. */}
+                {/* These arrows change the map in the middle. */}
                 <button
                   type="button"
                   onClick={showPreviousMap}
@@ -239,7 +239,7 @@ export default function Home() {
             title="Announcements"
             className="lg:col-span-4"
           >
-            {/* Announcements are loaded from the same shared content system as week items. */}
+            {/* These announcements are also saved by teachers. */}
             <div className="space-y-3">
               {announcements.map((announcement) => (
                 <article
@@ -266,7 +266,7 @@ export default function Home() {
 
         </div>
 
-        {/* Teacher login entry point. */}
+        {/* Teachers use this button to edit the website. */}
         <div>
           <Link
             to="/teacher-login"

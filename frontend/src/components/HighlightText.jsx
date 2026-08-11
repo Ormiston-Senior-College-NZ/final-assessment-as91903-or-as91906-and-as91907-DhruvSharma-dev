@@ -1,16 +1,16 @@
 export default function HighlightText({ text, highlight }) {
-  // If there is no search word, show the text normally.
+  // Show normal text when there is nothing to highlight.
   if (!highlight || !text) {
     return text;
   }
 
-  // Split the text around the searched word so matching parts can be highlighted.
-  // The replace line escapes special characters like "." or "?" in a search.
+  // Split the text wherever the searched word appears.
+  // This stops symbols like "." or "?" from breaking the search pattern.
   const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const parts = text.split(new RegExp(`(${escapedHighlight})`, "gi"));
 
   return parts.map((part, index) =>
-    // Matching pieces become yellow, while non-matching pieces stay normal text.
+    // Matching parts get a yellow background.
     part.toLowerCase() === highlight.toLowerCase() ? (
       <mark
         key={`${part}-${index}`}

@@ -7,9 +7,10 @@ import {
   getStoredSubjects,
   loadStoredSubjects,
 } from "../data/studentNetData";
+import { scoreSearchText } from "../utils/siteSearch";
 
 export default function Curriculum() {
-  // Search highlighting comes from the navbar query string.
+  // Get the word searched in the navbar.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
   const [activeLevel, setActiveLevel] = useState("level2");
@@ -17,12 +18,12 @@ export default function Curriculum() {
   const [subjects, setSubjects] = useState(() => getStoredSubjects());
 
   useEffect(() => {
-    // Load teacher-edited subjects from Flask/SQLite.
+    // Load any subjects the teacher has changed.
     loadStoredSubjects().then(setSubjects);
   }, []);
 
   const filteredSubjects = useMemo(() => {
-    // Filter the subject list when the student types in the subject search box.
+    // Search names, descriptions and pathways, then show the best matches first.
     const activeSubjects = subjects[activeLevel] || [];
     const normalizedSearchTerm = searchTerm.trim().toLowerCase();
 
@@ -30,9 +31,19 @@ export default function Curriculum() {
       return activeSubjects;
     }
 
-    return activeSubjects.filter((subject) =>
-      subject.name.toLowerCase().includes(normalizedSearchTerm),
-    );
+    return activeSubjects
+      .map((subject) => ({
+        subject,
+        score:
+          scoreSearchText(normalizedSearchTerm, subject.name) * 2 +
+          scoreSearchText(
+            normalizedSearchTerm,
+            `${subject.description} ${subject.pathway}`,
+          ),
+      }))
+      .filter((result) => result.score > 0)
+      .sort((firstResult, secondResult) => secondResult.score - firstResult.score)
+      .map((result) => result.subject);
   }, [activeLevel, searchTerm, subjects]);
 
   const [selectedSubjectId, setSelectedSubjectId] = useState("");

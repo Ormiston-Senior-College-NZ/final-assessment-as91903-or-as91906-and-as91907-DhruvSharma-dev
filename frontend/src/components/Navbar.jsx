@@ -1,8 +1,19 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
+import {
+  getStoredAnnouncements,
+  getStoredCareersSupport,
+  getStoredNorms,
+  getStoredQuickLinks,
+  getStoredStudentInfoLinks,
+  getStoredSubjects,
+  getStoredWebAppLinks,
+  getStoredWeekItems,
+} from "../data/studentNetData";
+import { findBestSearchRoute } from "../utils/siteSearch";
 
-// Shared styling for each navbar link, including the active page state.
+// Give every navbar link the same style.
 const navLinkClass = ({ isActive }) =>
   `
     rounded-lg
@@ -26,38 +37,53 @@ const navLinkClass = ({ isActive }) =>
     }
   `;
 
-// Simple keyword map that sends searches to the most likely page.
-// More specific pages are near the top so they win before broader words.
-const searchRoutes = [
-  {
-    path: "/careers",
-    keywords: ["career", "careers", "gateway", "university", "apprenticeship"],
-  },
-  {
-    path: "/curriculum",
-    keywords: ["curriculum", "subject", "subjects", "ncea", "level", "pathway", "scholarship", "scholarships"],
-  },
-  {
-    path: "/student-info",
-    keywords: ["student", "gpa", "rank", "score", "sports", "leadership", "doe"],
-  },
-  {
-    path: "/web-apps",
-    keywords: ["web", "apps", "gmail", "classroom", "refseek", "myportfolio"],
-  },
-  {
-    path: "/expectations",
-    keywords: ["expectation", "expectations", "norm", "norms", "attendance", "uniform", "behaviour", "devices", "exams"],
-  },
-  {
-    path: "/",
-    keywords: ["announcement", "announcements", "map", "calendar", "event", "week"],
-  },
-  {
-    path: "/expectations",
-    keywords: ["rules", "attendance"],
-  },
-];
+function searchableValues(items, fields) {
+  // Turn saved website content into one string that can be searched.
+  return items.flatMap((item) => fields.map((field) => item[field] || "")).join(" ");
+}
+
+function getSearchRoutes() {
+  // Each page has keywords and its real saved content to search through.
+  const subjects = Object.values(getStoredSubjects()).flat();
+  const careersSupport = getStoredCareersSupport();
+
+  return [
+    {
+      path: "/careers",
+      keywords: ["career", "careers", "gateway", "university", "apprenticeship", "advisor", "pathways"],
+      content: `${careersSupport.title} ${careersSupport.message} Andrea Daly Linda Scott Andrew Johnson Umani Ganegama`,
+    },
+    {
+      path: "/curriculum",
+      keywords: ["curriculum", "subject", "subjects", "ncea", "level", "pathway", "scholarship"],
+      content: searchableValues(subjects, ["name", "description", "pathway"]),
+    },
+    {
+      path: "/student-info",
+      keywords: ["student info", "gpa", "rank score", "credits", "grades", "sports", "leadership", "doe"],
+      content: searchableValues(getStoredStudentInfoLinks(), ["label"]),
+    },
+    {
+      path: "/web-apps",
+      keywords: ["web apps", "learning tools", "school websites", "gmail", "classroom", "refseek", "myportfolio"],
+      content: searchableValues(getStoredWebAppLinks(), ["label"]),
+    },
+    {
+      path: "/expectations",
+      keywords: ["expectation", "expectations", "norm", "norms", "rules", "attendance", "uniform", "behaviour", "devices"],
+      content: searchableValues(getStoredNorms(), ["title", "category", "content"]),
+    },
+    {
+      path: "/",
+      keywords: ["home", "announcement", "map", "calendar", "event", "week", "quick links"],
+      content: [
+        searchableValues(getStoredWeekItems(), ["day", "title", "time", "location"]),
+        searchableValues(getStoredAnnouncements(), ["title", "message", "date"]),
+        searchableValues(getStoredQuickLinks(), ["label"]),
+      ].join(" "),
+    },
+  ];
+}
 
 const navItems = [
   { path: "/", label: "Home" },
@@ -74,7 +100,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   function handleSearchSubmit(event) {
-    // When Enter is pressed, choose a page and pass the search word as a highlight.
+    // Pressing Enter finds the page that matches best.
     event.preventDefault();
 
     const trimmedSearchTerm = searchTerm.trim().toLowerCase();
@@ -83,14 +109,12 @@ export default function Navbar() {
       return;
     }
 
-    const matchingRoute =
-      searchRoutes.find((route) =>
-        // If the search text contains any keyword, that page is chosen.
-        route.keywords.some((keyword) => trimmedSearchTerm.includes(keyword)),
-      ) || searchRoutes[0];
+    // This checks full words, page content and small spelling mistakes.
+    const matchingRoute = findBestSearchRoute(trimmedSearchTerm, getSearchRoutes());
+    const destinationPath = matchingRoute?.path || "/";
 
-    // The highlight query lets the destination page mark matching words.
-    navigate(`${matchingRoute.path}?highlight=${encodeURIComponent(trimmedSearchTerm)}`);
+    // Put the search in the URL so the next page can highlight it.
+    navigate(`${destinationPath}?highlight=${encodeURIComponent(trimmedSearchTerm)}`);
     setSearchTerm("");
     setIsSearchOpen(false);
     setIsMenuOpen(false);
@@ -121,7 +145,7 @@ export default function Navbar() {
           xl:gap-6
         "
       >
-        {/* Mobile top row: logo, search icon, and hamburger menu. */}
+        {/* On mobile these buttons open the search and menu. */}
         <div className="flex w-full items-center justify-between gap-3 lg:w-auto">
           <img
             src={logo}
@@ -172,7 +196,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Desktop navigation stays visible across the top. */}
+        {/* The full menu is shown on larger screens. */}
         <div className="hidden items-center gap-3 lg:flex lg:flex-1 lg:justify-center xl:gap-4">
           {navItems.map((item) => (
             <NavLink
@@ -185,7 +209,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Desktop search stays visible, while mobile uses the search icon. */}
+        {/* Desktop has enough room to always show the search bar. */}
         <form
           onSubmit={handleSearchSubmit}
           className="hidden lg:block"

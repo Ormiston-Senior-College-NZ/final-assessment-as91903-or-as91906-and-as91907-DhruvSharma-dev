@@ -1,5 +1,5 @@
 export const curriculumLevels = [
-  // These IDs match the subject groups used on the Curriculum page.
+  // These IDs connect each button to the right group of subjects.
   { id: "level1", label: "LEVEL 1" },
   { id: "level2", label: "LEVEL 2" },
   { id: "level3", label: "LEVEL 3" },
@@ -7,7 +7,7 @@ export const curriculumLevels = [
 ];
 
 export const defaultSubjects = {
-  // Default subjects are used before teachers save custom content.
+  // Show these subjects until a teacher saves their own changes.
   level1: [
     {
       id: "l1-english",
@@ -89,7 +89,7 @@ export const defaultSubjects = {
 };
 
 export const defaultWeekItems = [
-  // Default home page weekly notices.
+  // Starter notices for the Home page.
   {
     id: "week-assembly",
     day: "Monday",
@@ -114,7 +114,7 @@ export const defaultWeekItems = [
 ];
 
 export const defaultAnnouncements = [
-  // Default home page announcements.
+  // Starter announcements for the Home page.
   {
     id: "announcement-welcome",
     title: "Welcome to StudentNET",
@@ -130,7 +130,7 @@ export const defaultAnnouncements = [
 ];
 
 export const defaultQuickLinks = [
-  // Default fixed bottom quick links.
+  // Starter links for the bar at the bottom.
   { id: "expectations", label: "Expectations", url: "/expectations", isInternal: true },
   { id: "kamar", label: "Kamar Portal", url: "https://ormiston.school.kiwi/" },
   {
@@ -151,7 +151,7 @@ export const defaultQuickLinks = [
 ];
 
 export const defaultStudentInfoLinks = [
-  // Default bottom cards on the Student Info page.
+  // Starter cards for the Student Info page.
   { id: "leadership", label: "Student Leadership", url: "" },
   { id: "doe", label: "DoE at OSC", url: "" },
   {
@@ -162,7 +162,7 @@ export const defaultStudentInfoLinks = [
 ];
 
 export const defaultWebAppLinks = [
-  // Default web app cards shown on the Web-Based App(s) page.
+  // Starter cards for the Web Apps page.
   {
     id: "best-choice",
     label: "Best Choice for Chemistry",
@@ -175,14 +175,14 @@ export const defaultWebAppLinks = [
 ];
 
 export const defaultCareersSupport = {
-  // Default text for the editable Careers support section.
+  // Starter text for the Careers section.
   title: "Careers Support at OSC",
   message:
     "The Careers Department supports students with pathways, university planning, apprenticeships, scholarships, Gateway, and career decision making.",
 };
 
 export const defaultNorms = [
-  // Default school norms shown before teachers save custom norms.
+  // Show these expectations until a teacher changes them.
   {
     id: "norm-attendance",
     title: "Attendance Expectations",
@@ -207,7 +207,7 @@ export const defaultNorms = [
 ];
 
 export const eventCalendarSheet = {
-  // The secure Google Sheet is embedded instead of fetched as raw data.
+  // These details are used to show the calendar Google Sheet.
   spreadsheetId: "173F-7IVXVgB9K0Cfz_GAPs5iFL6sfYq3Pi0-Ulhq794",
   gid: "660379046",
 };
@@ -227,7 +227,7 @@ const careersSupportStorageKey = "studentnet-careers-support";
 const normsStorageKey = "studentnet-school-norms";
 
 function readStoredValue(key, fallbackValue) {
-  // Read browser-saved content first so the UI has something to show immediately.
+  // Use the browser copy first so the page loads straight away.
   if (typeof window === "undefined") {
     return fallbackValue;
   }
@@ -246,13 +246,13 @@ function readStoredValue(key, fallbackValue) {
 }
 
 function writeStoredValue(key, value) {
-  // Save locally and also send the same content to the Flask/SQLite backend.
+  // Save in the browser and send the same data to Flask.
   window.localStorage.setItem(key, JSON.stringify(value));
   saveContentToDatabase(key, value);
 }
 
 async function loadContentFromDatabase(key, fallbackValue) {
-  // Try to load shared content from SQLite; fall back if Flask is unavailable.
+  // Try the database, but keep using the old data if Flask is offline.
   try {
     const response = await fetch(`${apiBaseUrl}/api/content/${key}`);
 
@@ -262,7 +262,7 @@ async function loadContentFromDatabase(key, fallbackValue) {
 
     const data = await response.json();
     const value = data.value ?? fallbackValue;
-    // Keep a local copy so the page still has data if Flask is closed next time.
+    // Keep a browser copy for the next time the page opens.
     window.localStorage.setItem(key, JSON.stringify(value));
 
     return value;
@@ -272,10 +272,10 @@ async function loadContentFromDatabase(key, fallbackValue) {
 }
 
 function saveContentToDatabase(key, value) {
-  // Fire-and-forget save so the UI stays responsive.
+  // Save in the background so the page does not freeze.
   fetch(`${apiBaseUrl}/api/content/${key}`, {
     method: "PUT",
-    // credentials includes the Flask login cookie for protected teacher saves.
+    // Send the login cookie so Flask knows this is a teacher.
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
@@ -381,7 +381,7 @@ export function saveStoredNorms(norms) {
 }
 
 export function createId(prefix) {
-  // Create a unique ID for new teacher-created items.
+  // Give each new item its own ID.
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return `${prefix}-${crypto.randomUUID()}`;
   }

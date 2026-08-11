@@ -12,7 +12,7 @@ import TeacherPanel from "./pages/TeacherPanel";
 function App() {
   return (
     <BrowserRouter>
-      {/* Main website routes. Each path loads a different page component. */}
+      {/* These routes decide which page is shown for each URL. */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/student-info" element={<StudentInfo />} />

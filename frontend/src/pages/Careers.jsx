@@ -12,7 +12,7 @@ import lindaScottPhoto from "../assets/Linda-Scott.jpg";
 import umaniGanegamaPhoto from "../assets/Umani-Ganegama.png";
 
 const careersStaff = [
-  // Careers staff cards link directly to each staff member's booking page.
+  // Store each careers staff member and their booking link here.
   {
     name: "Andrea Daly",
     role: "Careers Advisor",
@@ -40,7 +40,7 @@ const careersStaff = [
 ];
 
 function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
-  // Each card is a clickable image with a fade so the name stays readable.
+  // The fade makes the name easier to read over the photo.
   const hasBookingLink = Boolean(bookingUrl);
   const hasPhoto = Boolean(photoUrl);
   const CardElement = hasBookingLink ? "a" : "article";
@@ -91,7 +91,7 @@ function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
 }
 
 export default function Careers() {
-  // Highlight search terms passed from the navbar.
+  // Get the navbar search word from the URL.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
   const [careersSupport, setCareersSupport] = useState(() =>
@@ -99,7 +99,7 @@ export default function Careers() {
   );
 
   useEffect(() => {
-    // Load the editable careers support text from Flask/SQLite.
+    // Get the careers message saved by a teacher.
     loadStoredCareersSupport().then(setCareersSupport);
   }, []);
 

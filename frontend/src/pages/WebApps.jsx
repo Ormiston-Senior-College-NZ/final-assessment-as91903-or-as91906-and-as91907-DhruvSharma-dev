@@ -5,19 +5,19 @@ import Layout from "../components/Layout";
 import { getStoredWebAppLinks, loadStoredWebAppLinks } from "../data/studentNetData";
 
 function getLogoUrl(url) {
-  // Use Google's favicon service to show a simple logo for each web app.
+  // Get a small logo for each website from Google.
   try {
-    // URL() pulls out just the domain, for example mail.google.com.
+    // Only the domain is needed, like mail.google.com.
     const domain = new URL(url).hostname;
     return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
   } catch {
-    // If the URL is empty or invalid, return no image instead of breaking.
+    // A bad URL should not crash the whole page.
     return "";
   }
 }
 
 function WebAppCard({ label, url, highlight }) {
-  // One web app card with a logo, name, and open button.
+  // This makes one card for a web app.
   const logoUrl = getLogoUrl(url);
 
   return (
@@ -49,14 +49,14 @@ function WebAppCard({ label, url, highlight }) {
 }
 
 export default function WebApps() {
-  // Load teacher-edited web app links from Flask/SQLite.
+  // Start with the web app links already saved in the browser.
   const [searchParams] = useSearchParams();
-  // The navbar search passes this word in the URL.
+  // Get the navbar search word from the URL.
   const highlight = searchParams.get("highlight") || "";
   const [webApps, setWebApps] = useState(() => getStoredWebAppLinks());
 
   useEffect(() => {
-    // Replace the default links with saved links if teachers have edited them.
+    // Check the database for newer links.
     loadStoredWebAppLinks().then(setWebApps);
   }, []);
 
@@ -73,7 +73,7 @@ export default function WebApps() {
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-          {/* Each card is created from the shared web app link data. */}
+          {/* Make a card for every saved app. */}
           {webApps.map((app) => (
             <WebAppCard
               key={app.id}

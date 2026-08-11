@@ -8,19 +8,19 @@ import {
 } from "../data/studentNetData";
 
 export default function Expectations() {
-  // Highlight words when the navbar search sends a query here.
+  // Highlight the word searched in the navbar.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
   const [norms, setNorms] = useState(() => getStoredNorms());
   const [activeCategory, setActiveCategory] = useState("");
 
   useEffect(() => {
-    // Load teacher-edited expectations from Flask/SQLite.
+    // Get the newest expectations saved by a teacher.
     loadStoredNorms().then(setNorms);
   }, []);
 
   const categories = useMemo(() => {
-    // Build category buttons from the saved expectations.
+    // Make one button for each category without repeats.
     const savedCategories = norms
       .map((norm) => norm.category)
       .filter(Boolean);
@@ -31,7 +31,7 @@ export default function Expectations() {
   const selectedCategory = activeCategory || categories[0] || "";
 
   const filteredNorms = useMemo(() => {
-    // Filter by the selected category button.
+    // Only show expectations from the chosen category.
     return norms.filter((norm) => {
       const normCategory = norm.category || "";
 
