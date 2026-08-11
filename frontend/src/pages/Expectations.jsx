@@ -86,7 +86,7 @@ export default function Expectations() {
                       <HighlightText text={norm.title} highlight={highlight} />
                     </h3>
 
-                    <p className="mt-4 whitespace-pre-wrap break-words text-base leading-7 text-gray-700 sm:text-lg sm:leading-8">
+                    <p className="mt-4 whitespace-pre-wrap wrap-break-word text-base leading-7 text-gray-700 sm:text-lg sm:leading-8">
                       <HighlightText text={norm.content} highlight={highlight} />
                     </p>
                   </section>

@@ -15,16 +15,20 @@ const nceaGradeOptions = [
 ];
 
 const startingCreditEntries = [
-  // Start with three rows, but the calculations work from whatever rows are filled in.
-  { id: 1, credits: "", grade: "" },
-  { id: 2, credits: "", grade: "" },
-  { id: 3, credits: "", grade: "" },
+  // Each row always represents one NCEA grade.
+  { id: 1, credits: "", grade: "excellence" },
+  { id: 2, credits: "", grade: "merit" },
+  { id: 3, credits: "", grade: "achieved" },
 ];
 
 function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
-  // One row where students enter credits and choose a grade.
+  // Students only need to enter how many credits they got for this grade.
+  const grade = nceaGradeOptions.find(
+    (gradeOption) => gradeOption.value === creditEntry.grade,
+  );
+
   return (
-    <div className="grid min-h-16 grid-cols-1 items-center rounded-lg border border-[#F2901D] bg-white sm:grid-cols-[1fr_13rem]">
+    <div className="grid min-h-16 grid-cols-[1fr_auto] overflow-hidden rounded-lg border border-[#F2901D] bg-white">
       <input
         type="number"
         min="0"
@@ -38,7 +42,7 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
           h-full
           min-w-0
           w-full
-          rounded-md
+          min-h-16
           px-3
           text-base
           text-[#F2901D]
@@ -47,35 +51,9 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
         "
       />
 
-      <select
-        value={creditEntry.grade}
-        onChange={(event) =>
-          onCreditEntryChange(creditEntry.id, "grade", event.target.value)
-        }
-        aria-label="Grade"
-        className="
-          h-full
-          w-full
-          rounded-lg
-          border
-          border-[#F2901D]
-          bg-white
-          px-3
-          text-base
-          text-[#F2901D]
-          outline-none
-        "
-      >
-        <option value="">Grade..</option>
-        {nceaGradeOptions.map((grade) => (
-          <option
-            key={grade.value}
-            value={grade.value}
-          >
-            {grade.label}
-          </option>
-        ))}
-      </select>
+      <div className="flex min-h-16 w-32 items-center justify-center border-l border-[#F2901D] px-3 text-sm font-semibold text-[#F2901D] sm:w-44 sm:text-base">
+        {grade?.label}
+      </div>
     </div>
   );
 }
