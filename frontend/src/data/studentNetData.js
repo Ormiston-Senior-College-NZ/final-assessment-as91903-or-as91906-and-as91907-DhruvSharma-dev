@@ -1,3 +1,8 @@
+// Shared content and database functions used by the React pages.
+//
+// Default values appear while content is loading, and localStorage keeps a recent
+// copy in the browser. Smaller sections are saved as JSON, while announcements and
+// curriculum have separate database routes so records can be edited individually.
 export const curriculumLevels = [
   // These IDs connect each button to the right group of subjects.
   { id: "level1", label: "LEVEL 1" },
@@ -5,6 +10,10 @@ export const curriculumLevels = [
   { id: "level3", label: "LEVEL 3" },
   { id: "scholarships", label: "Scholarships" },
 ];
+
+// -----------------------------------------------------------------------------
+// Safe initial values used before shared database content is available
+// -----------------------------------------------------------------------------
 
 export const defaultSubjects = {
   // Show these subjects until a teacher saves their own changes.
@@ -216,6 +225,8 @@ export const eventCalendarViewUrl = `https://docs.google.com/spreadsheets/d/${ev
 
 export const eventCalendarEmbedUrl = `https://docs.google.com/spreadsheets/d/${eventCalendarSheet.spreadsheetId}/preview?gid=${eventCalendarSheet.gid}`;
 
+// Storage keys deliberately match the generic content-table keys. That makes it
+// easy to identify the same category in browser storage, requests and SQLite.
 const apiBaseUrl = "http://localhost:5000";
 const subjectsStorageKey = "studentnet-curriculum-subjects";
 const weekStorageKey = "studentnet-whats-on-this-week";
@@ -226,8 +237,13 @@ const webAppLinksStorageKey = "studentnet-web-app-links";
 const careersSupportStorageKey = "studentnet-careers-support";
 const normsStorageKey = "studentnet-school-norms";
 
+// -----------------------------------------------------------------------------
+// Cache and HTTP helpers
+// -----------------------------------------------------------------------------
+
 function readStoredValue(key, fallbackValue) {
-  // Use the browser copy first so the page loads straight away.
+  // Read local storage synchronously so content appears on the first render.
+  // fallbackValue is used for a new browser, server rendering, or damaged JSON.
   if (typeof window === "undefined") {
     return fallbackValue;
   }
@@ -241,28 +257,32 @@ function readStoredValue(key, fallbackValue) {
   try {
     return JSON.parse(storedValue);
   } catch {
+    // Invalid saved JSON should not stop the rest of the website from loading.
     return fallbackValue;
   }
 }
 
-function writeStoredValue(key, value) {
-  // Save in the browser and send the same data to Flask.
+async function writeStoredValue(key, value) {
+  // Update local storage immediately, then send the same value to SQLite. This
+  // makes edits feel instant while still sharing them with other devices.
   window.localStorage.setItem(key, JSON.stringify(value));
-  saveContentToDatabase(key, value);
+  return saveContentToDatabase(key, value);
 }
 
 async function loadContentFromDatabase(key, fallbackValue) {
-  // Try the database, but keep using the old data if Flask is offline.
+  // Try to load the shared database value. If Flask is unavailable, use the
+  // saved browser copy or default value so the page can still load.
   try {
     const response = await fetch(`${apiBaseUrl}/api/content/${key}`);
 
     if (!response.ok) {
+      // This also handles a 404 when no teacher has saved this content yet.
       return fallbackValue;
     }
 
     const data = await response.json();
     const value = data.value ?? fallbackValue;
-    // Keep a browser copy for the next time the page opens.
+    // Cache the shared value so it can appear instantly on the next visit.
     window.localStorage.setItem(key, JSON.stringify(value));
 
     return value;
@@ -271,30 +291,92 @@ async function loadContentFromDatabase(key, fallbackValue) {
   }
 }
 
-function saveContentToDatabase(key, value) {
-  // Save in the background so the page does not freeze.
-  fetch(`${apiBaseUrl}/api/content/${key}`, {
+async function saveContentToDatabase(key, value) {
+  const response = await fetch(`${apiBaseUrl}/api/content/${key}`, {
     method: "PUT",
-    // Send the login cookie so Flask knows this is a teacher.
+    // The session cookie proves to Flask that a logged-in teacher made the edit.
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ value }),
-  }).catch(() => {});
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "The database save failed.");
+  }
+
+  return data;
 }
 
+async function relationalRequest(path, options = {}) {
+  // Normalized tables use REST routes rather than the older generic JSON route.
+  // Keep authentication and error handling in one place for every CRUD request.
+  const response = await fetch(`${apiBaseUrl}${path}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    ...options,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "The database request failed.");
+  }
+  return data;
+}
+
+// -----------------------------------------------------------------------------
+// Normalized Curriculum data access
+// -----------------------------------------------------------------------------
+
 export function getStoredSubjects() {
+  // The cached/default curriculum appears immediately while SQLite is loading.
   return readStoredValue(subjectsStorageKey, defaultSubjects);
 }
 
 export function loadStoredSubjects() {
-  return loadContentFromDatabase(subjectsStorageKey, getStoredSubjects());
+  // Replace the cached curriculum with the grouped result of Flask's JOIN query.
+  return fetch(`${apiBaseUrl}/api/curriculum`)
+    .then(async (response) => {
+      if (!response.ok) {
+        return getStoredSubjects();
+      }
+      const data = await response.json();
+      window.localStorage.setItem(subjectsStorageKey, JSON.stringify(data.subjects));
+      return data.subjects;
+    })
+    .catch(() => getStoredSubjects());
 }
 
-export function saveStoredSubjects(subjects) {
-  writeStoredValue(subjectsStorageKey, subjects);
+export function createDatabaseSubject(subject) {
+  // POST creates the subject and all selected subject-level relationships.
+  return relationalRequest("/api/subjects", {
+    method: "POST",
+    body: JSON.stringify(subject),
+  });
 }
+
+export function updateDatabaseSubject(subjectId, subject) {
+  // PUT synchronizes the subject's selected curriculum levels in one transaction.
+  return relationalRequest(`/api/subjects/${subjectId}`, {
+    method: "PUT",
+    body: JSON.stringify(subject),
+  });
+}
+
+export function deleteDatabaseSubject(subjectId, levelId) {
+  // The level query removes only the relationship currently shown in the editor.
+  return relationalRequest(`/api/subjects/${subjectId}?level=${encodeURIComponent(levelId)}`, {
+    method: "DELETE",
+  });
+}
+
+// -----------------------------------------------------------------------------
+// Generic weekly content data access
+// -----------------------------------------------------------------------------
 
 export function getStoredWeekItems() {
   return readStoredValue(weekStorageKey, defaultWeekItems);
@@ -305,20 +387,61 @@ export function loadStoredWeekItems() {
 }
 
 export function saveStoredWeekItems(weekItems) {
-  writeStoredValue(weekStorageKey, weekItems);
+  return writeStoredValue(weekStorageKey, weekItems);
 }
 
+// -----------------------------------------------------------------------------
+// Normalized Announcement data access
+// -----------------------------------------------------------------------------
+
 export function getStoredAnnouncements() {
+  // Keep a local copy available while the normalized table is being requested.
   return readStoredValue(announcementsStorageKey, defaultAnnouncements);
 }
 
 export function loadStoredAnnouncements() {
-  return loadContentFromDatabase(announcementsStorageKey, getStoredAnnouncements());
+  // Announcements now come from individual relational rows rather than JSON.
+  return fetch(`${apiBaseUrl}/api/announcements`)
+    .then(async (response) => {
+      if (!response.ok) {
+        return getStoredAnnouncements();
+      }
+      const data = await response.json();
+      window.localStorage.setItem(
+        announcementsStorageKey,
+        JSON.stringify(data.announcements),
+      );
+      return data.announcements;
+    })
+    .catch(() => getStoredAnnouncements());
 }
 
-export function saveStoredAnnouncements(announcements) {
-  writeStoredValue(announcementsStorageKey, announcements);
+export function createDatabaseAnnouncement(announcement) {
+  // The database assigns the new announcement's integer primary key.
+  return relationalRequest("/api/announcements", {
+    method: "POST",
+    body: JSON.stringify(announcement),
+  });
 }
+
+export function updateDatabaseAnnouncement(announcementId, announcement) {
+  // Update only the row selected in the Teacher Panel.
+  return relationalRequest(`/api/announcements/${announcementId}`, {
+    method: "PUT",
+    body: JSON.stringify(announcement),
+  });
+}
+
+export function deleteDatabaseAnnouncement(announcementId) {
+  // DELETE removes one normalized record rather than rewriting a full list.
+  return relationalRequest(`/api/announcements/${announcementId}`, {
+    method: "DELETE",
+  });
+}
+
+// -----------------------------------------------------------------------------
+// Remaining generic editable sections
+// -----------------------------------------------------------------------------
 
 export function getStoredQuickLinks() {
   return readStoredValue(quickLinksStorageKey, defaultQuickLinks);
@@ -329,7 +452,7 @@ export function loadStoredQuickLinks() {
 }
 
 export function saveStoredQuickLinks(links) {
-  writeStoredValue(quickLinksStorageKey, links);
+  return writeStoredValue(quickLinksStorageKey, links);
 }
 
 export function getStoredStudentInfoLinks() {
@@ -341,7 +464,7 @@ export function loadStoredStudentInfoLinks() {
 }
 
 export function saveStoredStudentInfoLinks(links) {
-  writeStoredValue(studentInfoLinksStorageKey, links);
+  return writeStoredValue(studentInfoLinksStorageKey, links);
 }
 
 export function getStoredWebAppLinks() {
@@ -353,7 +476,7 @@ export function loadStoredWebAppLinks() {
 }
 
 export function saveStoredWebAppLinks(links) {
-  writeStoredValue(webAppLinksStorageKey, links);
+  return writeStoredValue(webAppLinksStorageKey, links);
 }
 
 export function getStoredCareersSupport() {
@@ -365,7 +488,7 @@ export function loadStoredCareersSupport() {
 }
 
 export function saveStoredCareersSupport(content) {
-  writeStoredValue(careersSupportStorageKey, content);
+  return writeStoredValue(careersSupportStorageKey, content);
 }
 
 export function getStoredNorms() {
@@ -377,11 +500,12 @@ export function loadStoredNorms() {
 }
 
 export function saveStoredNorms(norms) {
-  writeStoredValue(normsStorageKey, norms);
+  return writeStoredValue(normsStorageKey, norms);
 }
 
 export function createId(prefix) {
-  // Give each new item its own ID.
+  // randomUUID gives new items a reliable unique key for React and the editor.
+  // Date.now is a fallback for older browsers that do not support randomUUID.
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return `${prefix}-${crypto.randomUUID()}`;
   }

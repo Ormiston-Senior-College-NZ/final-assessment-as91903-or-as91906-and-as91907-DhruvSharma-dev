@@ -1,8 +1,17 @@
+// Teacher Panel for editing StudentNET content.
+//
+// The panel uses similar forms for several types of content. Announcements and
+// curriculum have their own database routes, while smaller sections are saved as
+// JSON. The selected curriculum menu decides which level a subject belongs to.
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  createDatabaseAnnouncement,
+  createDatabaseSubject,
   createId,
   curriculumLevels,
+  deleteDatabaseAnnouncement,
+  deleteDatabaseSubject,
   getStoredCareersSupport,
   getStoredAnnouncements,
   getStoredNorms,
@@ -19,17 +28,21 @@ import {
   loadStoredSubjects,
   loadStoredWebAppLinks,
   loadStoredWeekItems,
-  saveStoredAnnouncements,
   saveStoredCareersSupport,
   saveStoredNorms,
   saveStoredQuickLinks,
-  saveStoredSubjects,
   saveStoredStudentInfoLinks,
   saveStoredWebAppLinks,
   saveStoredWeekItems,
+  updateDatabaseAnnouncement,
+  updateDatabaseSubject,
 } from "../data/studentNetData";
 
 const apiBaseUrl = "http://localhost:5000";
+
+// -----------------------------------------------------------------------------
+// Editor configuration and reusable blank form shapes
+// -----------------------------------------------------------------------------
 
 // Sidebar menu options choose which part of the website a teacher edits.
 const menuSections = [
@@ -141,20 +154,6 @@ function EditorTextarea({ label, value, onChange, placeholder }) {
   );
 }
 
-function PlaceholderPanel({ title }) {
-  // Temporary panel for menu items that are planned but not built yet.
-  return (
-    <div className="rounded-lg border border-[#F2901D] bg-white p-6">
-      <h2 className="text-2xl font-bold text-gray-950">
-        {title}
-      </h2>
-      <p className="mt-3 max-w-3xl leading-7 text-gray-600">
-        This editor is ready to be built later. For now, the working admin tools are curriculum subjects and What's on this week.
-      </p>
-    </div>
-  );
-}
-
 function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave, onClear, onDelete }) {
   // Reusable editor for Quick Links, Student Info links, and Web App links.
   return (
@@ -248,6 +247,10 @@ function LinkEditor({ title, links, selectedId, form, onSelect, onChange, onSave
 }
 
 export default function TeacherPanel() {
+  // ---------------------------------------------------------------------------
+  // Authentication, selected editor, database content and form state
+  // ---------------------------------------------------------------------------
+
   // Teacher Panel state stores the selected editor and all editable form values.
   const navigate = useNavigate();
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
@@ -275,11 +278,14 @@ export default function TeacherPanel() {
   );
   const [selectedLinkId, setSelectedLinkId] = useState("");
   const [linkForm, setLinkForm] = useState(blankLinkForm);
+  const [saveStatus, setSaveStatus] = useState({ type: "idle", message: "" });
 
   const activeLevel = curriculumLevels.find((level) => level.id === activeEditor);
   const isSubjectEditor = Boolean(activeLevel);
   const activeSubjects = isSubjectEditor ? subjects[activeEditor] || [] : [];
 
+  // Derive the visible heading rather than storing duplicate title state that
+  // could become inconsistent with activeEditor.
   const pageTitle = useMemo(() => {
     // The heading changes based on the selected sidebar menu item.
     if (activeEditor === "week") {
@@ -305,6 +311,10 @@ export default function TeacherPanel() {
     const allMenuItems = menuSections.flatMap((section) => section.items);
     return allMenuItems.find((item) => item.id === activeEditor)?.label || "Editor";
   }, [activeEditor, activeLevel]);
+
+  // ---------------------------------------------------------------------------
+  // Authentication and initial shared-data loading
+  // ---------------------------------------------------------------------------
 
   useEffect(() => {
     // Check with Flask that the teacher is logged in before showing the panel.
@@ -358,6 +368,33 @@ export default function TeacherPanel() {
     });
 
     navigate("/teacher-login");
+  }
+
+  async function persistChanges(saveRequest) {
+    // Report the real Flask/SQLite result instead of assuming a local update
+    // also reaches the shared database successfully.
+    setSaveStatus({ type: "saving", message: "Saving to database..." });
+
+    try {
+      await saveRequest;
+      setSaveStatus({ type: "success", message: "Changes saved to database." });
+      return true;
+    } catch (error) {
+      setSaveStatus({
+        type: "error",
+        message: error.message || "Database save failed. Please try again.",
+      });
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Small form-state helpers shared by the editors below
+  // ---------------------------------------------------------------------------
+
+  function confirmDelete(itemName) {
+    // Require a deliberate second action before any database record is removed.
+    return window.confirm(`Are you sure you want to delete this ${itemName}?`);
   }
 
   function updateSubjectForm(field, value) {
@@ -418,7 +455,11 @@ export default function TeacherPanel() {
     });
   }
 
-  function saveSubject(event) {
+  // ---------------------------------------------------------------------------
+  // Normalized Curriculum subject and junction-table operations
+  // ---------------------------------------------------------------------------
+
+  async function saveSubject(event) {
     // Add or update a subject in the selected curriculum level.
     event.preventDefault();
 
@@ -427,24 +468,22 @@ export default function TeacherPanel() {
     }
 
     const savedSubject = {
-      id: selectedSubjectId || createId(activeEditor),
       name: subjectForm.name.trim(),
       description: subjectForm.description.trim(),
       pathway: subjectForm.pathway.trim(),
+      // The open sidebar editor supplies the relationship automatically.
+      levels: [activeEditor],
+      editing_level: activeEditor,
     };
-
-    const updatedSubjects = {
-      ...subjects,
-      [activeEditor]: selectedSubjectId
-        ? activeSubjects.map((subject) =>
-            subject.id === selectedSubjectId ? savedSubject : subject,
-          )
-        : [...activeSubjects, savedSubject],
-    };
-
-    setSubjects(updatedSubjects);
-    saveStoredSubjects(updatedSubjects);
-    clearSubjectForm();
+    const request = selectedSubjectId
+      // Existing IDs use relational UPDATE; a blank selection creates a new row.
+      ? updateDatabaseSubject(selectedSubjectId, savedSubject)
+      : createDatabaseSubject(savedSubject);
+    if (await persistChanges(request)) {
+      // Reload the JOIN result so every level panel immediately reflects changes.
+      setSubjects(await loadStoredSubjects());
+      clearSubjectForm();
+    }
   }
 
   function clearSubjectForm() {
@@ -453,16 +492,17 @@ export default function TeacherPanel() {
     setSubjectForm(blankSubjectForm);
   }
 
-  function deleteSubject(subjectId) {
+  async function deleteSubject(subjectId) {
     // Remove the selected subject from the current level only.
-    const updatedSubjects = {
-      ...subjects,
-      [activeEditor]: activeSubjects.filter((subject) => subject.id !== subjectId),
-    };
+    if (!confirmDelete("subject")) {
+      return;
+    }
 
-    setSubjects(updatedSubjects);
-    saveStoredSubjects(updatedSubjects);
-    clearSubjectForm();
+    if (await persistChanges(deleteDatabaseSubject(subjectId, activeEditor))) {
+      // A subject may still appear under other levels after this relationship ends.
+      setSubjects(await loadStoredSubjects());
+      clearSubjectForm();
+    }
   }
 
   function selectWeekItem(item) {
@@ -475,6 +515,10 @@ export default function TeacherPanel() {
       location: item.location,
     });
   }
+
+  // ---------------------------------------------------------------------------
+  // Generic JSON weekly-item operations
+  // ---------------------------------------------------------------------------
 
   function saveWeekItem(event) {
     // Add or update an item in the "What's on this week" home card.
@@ -497,7 +541,7 @@ export default function TeacherPanel() {
       : [...weekItems, savedItem];
 
     setWeekItems(updatedWeekItems);
-    saveStoredWeekItems(updatedWeekItems);
+    persistChanges(saveStoredWeekItems(updatedWeekItems));
     setSelectedWeekItemId(savedItem.id);
   }
 
@@ -509,10 +553,14 @@ export default function TeacherPanel() {
 
   function deleteWeekItem(itemId) {
     // Remove one item from the home page week list.
+    if (!confirmDelete("weekly item")) {
+      return;
+    }
+
     const updatedWeekItems = weekItems.filter((item) => item.id !== itemId);
 
     setWeekItems(updatedWeekItems);
-    saveStoredWeekItems(updatedWeekItems);
+    persistChanges(saveStoredWeekItems(updatedWeekItems));
     clearWeekForm();
   }
 
@@ -526,7 +574,11 @@ export default function TeacherPanel() {
     });
   }
 
-  function saveAnnouncement(event) {
+  // ---------------------------------------------------------------------------
+  // Normalized Announcement row operations
+  // ---------------------------------------------------------------------------
+
+  async function saveAnnouncement(event) {
     // Add or update an announcement shown on the home page.
     event.preventDefault();
 
@@ -535,21 +587,18 @@ export default function TeacherPanel() {
     }
 
     const savedAnnouncement = {
-      id: selectedAnnouncementId || createId("announcement"),
       title: announcementForm.title.trim(),
       message: announcementForm.message.trim(),
       date: announcementForm.date.trim(),
     };
-
-    const updatedAnnouncements = selectedAnnouncementId
-      ? announcements.map((announcement) =>
-          announcement.id === selectedAnnouncementId ? savedAnnouncement : announcement,
-        )
-      : [...announcements, savedAnnouncement];
-
-    setAnnouncements(updatedAnnouncements);
-    saveStoredAnnouncements(updatedAnnouncements);
-    setSelectedAnnouncementId(savedAnnouncement.id);
+    const request = selectedAnnouncementId
+      // Integer IDs distinguish an existing announcement from a new form entry.
+      ? updateDatabaseAnnouncement(selectedAnnouncementId, savedAnnouncement)
+      : createDatabaseAnnouncement(savedAnnouncement);
+    if (await persistChanges(request)) {
+      setAnnouncements(await loadStoredAnnouncements());
+      clearAnnouncementForm();
+    }
   }
 
   function clearAnnouncementForm() {
@@ -558,15 +607,16 @@ export default function TeacherPanel() {
     setAnnouncementForm(blankAnnouncementForm);
   }
 
-  function deleteAnnouncement(announcementId) {
+  async function deleteAnnouncement(announcementId) {
     // Remove one announcement from the home page list.
-    const updatedAnnouncements = announcements.filter(
-      (announcement) => announcement.id !== announcementId,
-    );
+    if (!confirmDelete("announcement")) {
+      return;
+    }
 
-    setAnnouncements(updatedAnnouncements);
-    saveStoredAnnouncements(updatedAnnouncements);
-    clearAnnouncementForm();
+    if (await persistChanges(deleteDatabaseAnnouncement(announcementId))) {
+      setAnnouncements(await loadStoredAnnouncements());
+      clearAnnouncementForm();
+    }
   }
 
   function selectNorm(norm) {
@@ -578,6 +628,10 @@ export default function TeacherPanel() {
       content: norm.content,
     });
   }
+
+  // ---------------------------------------------------------------------------
+  // Generic Expectations and Careers content operations
+  // ---------------------------------------------------------------------------
 
   function saveNorm(event) {
     // Add or update an expectation shown on the Expectations page.
@@ -599,7 +653,7 @@ export default function TeacherPanel() {
       : [...norms, savedNorm];
 
     setNorms(updatedNorms);
-    saveStoredNorms(updatedNorms);
+    persistChanges(saveStoredNorms(updatedNorms));
     clearNormForm();
   }
 
@@ -611,10 +665,14 @@ export default function TeacherPanel() {
 
   function deleteNorm(normId) {
     // Remove one expectation from the Expectations page list.
+    if (!confirmDelete("expectation")) {
+      return;
+    }
+
     const updatedNorms = norms.filter((norm) => norm.id !== normId);
 
     setNorms(updatedNorms);
-    saveStoredNorms(updatedNorms);
+    persistChanges(saveStoredNorms(updatedNorms));
     clearNormForm();
   }
 
@@ -628,7 +686,7 @@ export default function TeacherPanel() {
     };
 
     setCareersSupport(savedContent);
-    saveStoredCareersSupport(savedContent);
+    persistChanges(saveStoredCareersSupport(savedContent));
   }
 
   function getActiveLinks() {
@@ -644,17 +702,21 @@ export default function TeacherPanel() {
     return webAppLinks;
   }
 
+  // ---------------------------------------------------------------------------
+  // Reusable generic link operations for three different site sections
+  // ---------------------------------------------------------------------------
+
   function saveActiveLinks(links) {
     // Save the selected link list back to shared storage and SQLite.
     if (activeEditor === "quick-links") {
       setQuickLinks(links);
-      saveStoredQuickLinks(links);
+      persistChanges(saveStoredQuickLinks(links));
     } else if (activeEditor === "student-info") {
       setStudentInfoLinks(links);
-      saveStoredStudentInfoLinks(links);
+      persistChanges(saveStoredStudentInfoLinks(links));
     } else {
       setWebAppLinks(links);
-      saveStoredWebAppLinks(links);
+      persistChanges(saveStoredWebAppLinks(links));
     }
   }
 
@@ -700,6 +762,10 @@ export default function TeacherPanel() {
 
   function deleteLink(linkId) {
     // Delete one link from whichever link editor is currently open.
+    if (!confirmDelete("link")) {
+      return;
+    }
+
     const updatedLinks = getActiveLinks().filter((link) => link.id !== linkId);
     saveActiveLinks(updatedLinks);
     clearLinkForm();
@@ -714,6 +780,8 @@ export default function TeacherPanel() {
     );
   }
 
+  // Each conditional editor below is mounted only when selected. This keeps one
+  // protected page and shared state while avoiding separate nearly-identical routes.
   return (
     <main className="min-h-screen bg-[#404040] p-2 sm:p-5 lg:h-screen lg:overflow-hidden">
       <section className="grid min-h-[calc(100vh-1rem)] grid-cols-1 gap-3 rounded-xl border border-[#F2901D] bg-white p-2 text-base sm:min-h-[calc(100vh-2.5rem)] sm:p-3 lg:h-full lg:min-h-0 lg:grid-cols-[15rem_1fr] lg:overflow-hidden xl:grid-cols-[17rem_1fr]">
@@ -778,6 +846,22 @@ export default function TeacherPanel() {
               Logout
             </button>
           </div>
+
+          {saveStatus.type !== "idle" && (
+            <p
+              role="status"
+              aria-live="polite"
+              className={`mb-4 rounded-md border px-3 py-2 text-sm font-semibold lg:shrink-0 ${
+                saveStatus.type === "error"
+                  ? "border-red-300 bg-red-50 text-red-700"
+                  : saveStatus.type === "success"
+                    ? "border-green-300 bg-green-50 text-green-700"
+                    : "border-[#F2901D] bg-[#fff8ec] text-gray-700"
+              }`}
+            >
+              {saveStatus.message}
+            </p>
+          )}
 
           {/* Subject editor is reused for Level 1, Level 2, Level 3, and Scholarships. */}
           {isSubjectEditor && (
@@ -1230,14 +1314,6 @@ export default function TeacherPanel() {
             />
           )}
 
-          {!isSubjectEditor &&
-            activeEditor !== "week" &&
-            activeEditor !== "announcements" &&
-            activeEditor !== "norms" &&
-            activeEditor !== "careers-support" &&
-            !["apps", "student-info", "quick-links"].includes(activeEditor) && (
-            <PlaceholderPanel title={pageTitle} />
-          )}
         </section>
       </section>
     </main>

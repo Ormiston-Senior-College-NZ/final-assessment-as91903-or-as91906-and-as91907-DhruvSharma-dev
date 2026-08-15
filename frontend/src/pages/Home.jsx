@@ -1,3 +1,6 @@
+// StudentNET dashboard. It combines editable weekly notices and normalized
+// announcements with the restricted Google calendar, interactive school maps and
+// search highlighting. Local fallback content appears before database requests end.
 import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
 import DashboardCard from "../components/DashboardCard";

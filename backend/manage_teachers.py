@@ -1,9 +1,20 @@
+"""Terminal-only teacher account administration for StudentNET.
+
+Account management deliberately stays outside the Teacher Panel. Only an IT
+administrator with access to the server terminal can add, reset, disable or inspect
+accounts. The script shares the same SQLite file and password-hashing format as
+app.py, so changes take effect the next time Flask validates a login or session.
+"""
+
 import argparse
 import os
 import sqlite3
 
+from werkzeug.security import generate_password_hash
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Build the path from this file so the script works from any terminal folder.
 DATABASE_FILE = os.path.join(BASE_DIR, "studentnet.db")
 
 
@@ -11,11 +22,12 @@ def get_database_connection():
     # Open the same SQLite database used by the Flask app.
     connection = sqlite3.connect(DATABASE_FILE)
     connection.row_factory = sqlite3.Row
+    connection.execute("PRAGMA foreign_keys = ON")
     return connection
 
 
 def setup_database():
-    # Make sure the teachers table exists before editing accounts.
+    # This script may be run before Flask, so it checks that the table exists first.
     with get_database_connection() as connection:
         connection.execute(
             """
@@ -30,11 +42,18 @@ def setup_database():
 
 
 def add_teacher(email, password):
-    # Add a new teacher, or reactivate/update them if the email already exists.
+    # Add a new account. If the email already exists, update its password and
+    # turn access back on instead of creating a duplicate teacher.
     setup_database()
+    email = email.strip().lower()
+
+    if "@" not in email or "." not in email.split("@", 1)[1]:
+        raise ValueError("Enter a valid teacher email address.")
+    if len(password) < 8:
+        raise ValueError("The password must contain at least 8 characters.")
 
     with get_database_connection() as connection:
-        # ON CONFLICT means the same email can be updated instead of duplicated.
+        # The question marks safely pass values separately from the SQL command.
         connection.execute(
             """
             INSERT INTO teachers (email, password, is_active)
@@ -43,42 +62,44 @@ def add_teacher(email, password):
                 password = excluded.password,
                 is_active = 1
             """,
-            (email.lower(), password),
+            (email, generate_password_hash(password)),
         )
 
-    print(f"Added access for {email.lower()}")
+    print(f"Added access for {email}")
 
 
 def remove_teacher(email):
-    # Keep the teacher in the database, but stop them from logging in.
+    # Soft removal changes is_active to 0 instead of deleting the account.
     setup_database()
+    email = email.strip().lower()
 
     with get_database_connection() as connection:
-        # This keeps a record of the teacher while disabling their access.
+        # Keeping the row means the account can easily be turned back on later.
         connection.execute(
             "UPDATE teachers SET is_active = 0 WHERE email = ?",
-            (email.lower(),),
+            (email,),
         )
 
-    print(f"Removed access for {email.lower()}")
+    print(f"Removed access for {email}")
 
 
 def list_teachers():
-    # Print all teacher accounts so access can be checked from the terminal.
+    # Sort accounts by email so the terminal list is easier to check.
     setup_database()
 
     with get_database_connection() as connection:
         teachers = connection.execute(
-            "SELECT email, password, is_active FROM teachers ORDER BY email"
+            "SELECT email, is_active FROM teachers ORDER BY email"
         ).fetchall()
 
     for teacher in teachers:
+        # Change the database number into a word that is easier to understand.
         status = "active" if teacher["is_active"] else "removed"
-        print(f"{teacher['email']} | {teacher['password']} | {status}")
+        print(f"{teacher['email']} | {status}")
 
 
 def main():
-    # Define the terminal commands: add, remove, and list.
+    # argparse reads commands typed after the file name in the terminal.
     parser = argparse.ArgumentParser(description="Manage StudentNET teachers.")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -96,13 +117,18 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "add":
-        add_teacher(args.email, args.password)
-    elif args.command == "remove":
-        remove_teacher(args.email)
-    elif args.command == "list":
-        list_teachers()
+    # Run the function that matches the chosen terminal command.
+    try:
+        if args.command == "add":
+            add_teacher(args.email, args.password)
+        elif args.command == "remove":
+            remove_teacher(args.email)
+        elif args.command == "list":
+            list_teachers()
+    except ValueError as error:
+        parser.error(str(error))
 
 
 if __name__ == "__main__":
+    # Only run the command menu when this file is opened directly.
     main()

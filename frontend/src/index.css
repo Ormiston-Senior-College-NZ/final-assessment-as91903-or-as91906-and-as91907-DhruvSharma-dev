@@ -1,1 +1,3 @@
+/* Tailwind scans the JSX source and generates only the utility styles the project
+   uses. Keeping this global entry small avoids unused template CSS. */
 @import "tailwindcss";

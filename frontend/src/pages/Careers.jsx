@@ -1,3 +1,6 @@
+// Careers page. Staff cards are fixed presentation content, while the support title
+// and message are teacher-editable. The local value renders first and is replaced by
+// the shared SQLite value after the asynchronous request finishes.
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import HighlightText from "../components/HighlightText";
@@ -41,8 +44,11 @@ const careersStaff = [
 
 function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
   // The fade makes the name easier to read over the photo.
+  // Boolean changes a possible string or empty value into a clear true/false.
   const hasBookingLink = Boolean(bookingUrl);
   const hasPhoto = Boolean(photoUrl);
+
+  // Use a clickable link when booking is available, otherwise use a normal article.
   const CardElement = hasBookingLink ? "a" : "article";
 
   return (
@@ -69,6 +75,7 @@ function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
       `}
     >
       {hasPhoto && (
+        // Do not create a broken image element when there is no staff photo.
         <img
           src={photoUrl}
           alt={name}
@@ -76,6 +83,7 @@ function StaffCard({ name, role, photoUrl, bookingUrl, highlight }) {
         />
       )}
 
+      {/* This colour fade keeps dark and light photos readable. */}
       <div className="absolute inset-x-0 bottom-0 h-52 bg-linear-to-t from-[#FFC06E] via-[#FFF8EC]/70 to-transparent" />
 
       <div className="absolute bottom-0 left-0 right-0 px-5 pb-7 pt-24 text-center">
@@ -94,6 +102,8 @@ export default function Careers() {
   // Get the navbar search word from the URL.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
+
+  // Show locally saved careers text first while checking the shared database.
   const [careersSupport, setCareersSupport] = useState(() =>
     getStoredCareersSupport(),
   );
@@ -106,8 +116,10 @@ export default function Careers() {
   return (
     <Layout>
       <section className="space-y-4">
+        {/* Staff cards stack on phones and spread into four columns on wide screens. */}
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
           {careersStaff.map((staffMember) => (
+            // Spread passes name, role, photoUrl and bookingUrl into StaffCard.
             <StaffCard
               key={staffMember.name}
               highlight={highlight}
@@ -120,6 +132,7 @@ export default function Careers() {
           <span className="font-bold">Note:</span> clicking on the name, will take you to the booking page
         </p>
 
+        {/* Teachers can edit this support message from the Teacher Panel. */}
         <article className="rounded-lg border border-[#F2901D] bg-white p-6">
           <h1 className="text-2xl font-bold text-gray-950">
             <HighlightText text={careersSupport.title} highlight={highlight} />

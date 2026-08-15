@@ -1,3 +1,6 @@
+// Responsive global navigation and site-wide search. Search combines fixed page
+// keywords with teacher-edited cached content, chooses the most relevant route, and
+// passes the query in the URL so destination pages can highlight matching content.
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
@@ -39,15 +42,20 @@ const navLinkClass = ({ isActive }) =>
 
 function searchableValues(items, fields) {
   // Turn saved website content into one string that can be searched.
+  // flatMap checks every requested field on every item. Missing fields use an
+  // empty string so incomplete teacher content cannot break the search.
   return items.flatMap((item) => fields.map((field) => item[field] || "")).join(" ");
 }
 
 function getSearchRoutes() {
   // Each page has keywords and its real saved content to search through.
+  // It runs on submit, so it reads the newest content in local storage.
   const subjects = Object.values(getStoredSubjects()).flat();
   const careersSupport = getStoredCareersSupport();
 
   return [
+    // Keywords describe common searches. Content contains the actual editable
+    // text, so new teacher-created items become searchable automatically.
     {
       path: "/careers",
       keywords: ["career", "careers", "gateway", "university", "apprenticeship", "advisor", "pathways"],
@@ -86,6 +94,7 @@ function getSearchRoutes() {
 }
 
 const navItems = [
+  // This one array is reused for both the desktop and mobile navigation menus.
   { path: "/", label: "Home" },
   { path: "/student-info", label: "Student Info" },
   { path: "/web-apps", label: "Web-Based App(s)" },
@@ -94,8 +103,11 @@ const navItems = [
 ];
 
 export default function Navbar() {
+  // useNavigate changes routes without refreshing the whole React application.
   const navigate = useNavigate();
+  // Desktop and mobile search inputs share this value.
   const [searchTerm, setSearchTerm] = useState("");
+  // These values control which mobile panel is currently visible.
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
@@ -106,16 +118,19 @@ export default function Navbar() {
     const trimmedSearchTerm = searchTerm.trim().toLowerCase();
 
     if (!trimmedSearchTerm) {
+      // Do nothing if the user submits only spaces or an empty input.
       return;
     }
 
     // This checks full words, page content and small spelling mistakes.
     const matchingRoute = findBestSearchRoute(trimmedSearchTerm, getSearchRoutes());
+    // If nothing matches, Home is used as a safe general fallback.
     const destinationPath = matchingRoute?.path || "/";
 
     // Put the search in the URL so the next page can highlight it.
     navigate(`${destinationPath}?highlight=${encodeURIComponent(trimmedSearchTerm)}`);
     setSearchTerm("");
+    // Close mobile panels after navigating so they do not cover the result.
     setIsSearchOpen(false);
     setIsMenuOpen(false);
   }

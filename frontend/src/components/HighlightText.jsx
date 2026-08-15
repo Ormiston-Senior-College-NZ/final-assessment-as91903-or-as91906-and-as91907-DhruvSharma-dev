@@ -1,3 +1,5 @@
+// Search-result presentation helper. It highlights matching text passed through the
+// URL without changing the original database value or injecting raw HTML into React.
 export default function HighlightText({ text, highlight }) {
   // Show normal text when there is nothing to highlight.
   if (!highlight || !text) {

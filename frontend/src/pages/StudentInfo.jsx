@@ -1,3 +1,6 @@
+// Student information page containing two client-side NCEA calculators and
+// teacher-editable resource links. Calculator state never enters the database;
+// only shared link content is loaded through Flask/SQLite.
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import HighlightText from "../components/HighlightText";
@@ -8,21 +11,23 @@ import {
 } from "../data/studentNetData";
 
 const nceaGradeOptions = [
-  // Each NCEA grade has a point value for GPA/rank score calculations.
+  // NCEA grades use different point values in both calculations. Keeping the
+  // labels and values together means the display and maths use the same data.
   { label: "Achieved", value: "achieved", points: 2 },
   { label: "Merit", value: "merit", points: 3 },
   { label: "Excellence", value: "excellence", points: 4 },
 ];
 
 const startingCreditEntries = [
-  // Each row always represents one NCEA grade.
+  // The rows have fixed grades in the requested order. Students only enter the
+  // credit totals, which is quicker and prevents selecting the same grade twice.
   { id: 1, credits: "", grade: "excellence" },
   { id: 2, credits: "", grade: "merit" },
   { id: 3, credits: "", grade: "achieved" },
 ];
 
 function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
-  // Students only need to enter how many credits they got for this grade.
+  // Find the full grade object so its readable label can be shown beside the input.
   const grade = nceaGradeOptions.find(
     (gradeOption) => gradeOption.value === creditEntry.grade,
   );
@@ -59,21 +64,22 @@ function CreditGradeRow({ creditEntry, onCreditEntryChange }) {
 }
 
 function CalculatorPanel({ title, calculatorType, highlight }) {
-  // Reusable calculator panel for GPA and rank score.
+  // The same panel is used twice. calculatorType decides whether it performs the
+  // GPA calculation or the Rank Score calculation, avoiding duplicated components.
   const [creditEntries, setCreditEntries] = useState(startingCreditEntries);
 
   const calculatorResult = useMemo(() => {
-    // Recalculate the result whenever credits or grades change.
+    // useMemo recalculates only when the entered credits or calculator type changes.
     const completedCreditEntries = creditEntries
       .map((creditEntry) => {
-        // Convert the form text into numbers before doing maths.
+        // HTML inputs return strings, so credits must be converted before adding.
         const credits = Number(creditEntry.credits);
         const grade = nceaGradeOptions.find(
           (option) => option.value === creditEntry.grade,
         );
 
         if (!credits || !grade) {
-          // Ignore rows that are not finished yet.
+          // Ignore empty or invalid rows so they do not affect the final result.
           return null;
         }
 
@@ -85,7 +91,8 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
       .filter(Boolean);
 
     if (calculatorType === "rankScore") {
-      // Rank score counts the best 80 credits, with Excellence worth the most.
+      // Rank Score uses at most the best 80 credits. Sorting by points ensures
+      // Excellence credits are counted first, then Merit, and then Achieved.
       let remainingCredits = 80;
       const bestCreditTotal = completedCreditEntries
         .sort(
@@ -98,7 +105,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
           }
 
           const creditsToCount = Math.min(creditEntry.credits, remainingCredits);
-          // Subtract credits so only the best 80 are counted.
+          // Only use the credits that still fit inside the 80-credit limit.
           remainingCredits -= creditsToCount;
 
           return total + creditsToCount * creditEntry.points;
@@ -107,6 +114,8 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
       return Math.min(bestCreditTotal, 320).toString();
     }
 
+    // GPA is a weighted average: total grade points divided by total credits.
+    // Multiplying credits by grade points gives each grade the correct weighting.
     const totalCreditsAndPoints = completedCreditEntries.reduce(
       (currentTotals, creditEntry) => ({
         credits: currentTotals.credits + creditEntry.credits,
@@ -116,7 +125,7 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
     );
 
     if (!totalCreditsAndPoints.credits) {
-      // Avoid dividing by zero before the student enters any credits.
+      // Dividing by zero would display NaN, so show the starting result instead.
       return "0.00";
     }
 
@@ -126,7 +135,8 @@ function CalculatorPanel({ title, calculatorType, highlight }) {
   }, [creditEntries, calculatorType]);
 
   function updateCreditEntry(creditEntryId, field, value) {
-    // Update only the row that the student changed.
+    // React state should not be edited directly. map creates a new array and only
+    // replaces the matching row, leaving the other two credit values unchanged.
     setCreditEntries((currentCreditEntries) =>
       currentCreditEntries.map((creditEntry) =>
         creditEntry.id === creditEntryId

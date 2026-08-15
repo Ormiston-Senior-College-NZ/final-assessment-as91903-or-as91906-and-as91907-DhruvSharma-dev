@@ -1,8 +1,11 @@
+// Fixed shortcut bar shown by Layout. It renders internal routes with React Router
+// and external destinations with normal anchors, while loading teacher-edited link
+// data from SQLite and retaining local defaults if Flask is temporarily unavailable.
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getStoredQuickLinks, loadStoredQuickLinks } from "../data/studentNetData";
 
-// Shared style for internal and external quick link buttons.
+// Both Link and anchor elements use this style so every shortcut looks the same.
 const quickLinkClass = `
   flex
   min-h-10
@@ -27,14 +30,16 @@ const quickLinkClass = `
 `;
 
 export default function QuickLinks() {
-  // Load saved quick links so teachers can edit them from the panel.
+  // Show the browser copy immediately, then check for newer database content.
   const [quickLinks, setQuickLinks] = useState(() => getStoredQuickLinks());
 
   useEffect(() => {
+    // The empty dependency array means this database request runs once on load.
     loadStoredQuickLinks().then(setQuickLinks);
   }, []);
 
   return (
+    // The outer container fixes the links near the bottom of every main page.
     <div className="fixed bottom-2 left-0 right-0 z-50 px-2 sm:bottom-4 sm:px-6">
       <div
         className="
@@ -54,7 +59,9 @@ export default function QuickLinks() {
       >
         <div className="flex flex-nowrap justify-start gap-1.5 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:gap-2 sm:overflow-visible sm:pb-0">
 
+          {/* Phones can scroll the row sideways, while larger screens wrap links. */}
           {quickLinks.map((quickLink) =>
+            // Internal links use React Router and external links open a new tab.
             quickLink.isInternal ? (
               <Link
                 key={quickLink.id}
@@ -68,6 +75,7 @@ export default function QuickLinks() {
                 key={quickLink.id}
                 href={quickLink.url}
                 target="_blank"
+                // Prevent the new website from controlling the original tab.
                 rel="noopener noreferrer"
                 className={quickLinkClass}
               >

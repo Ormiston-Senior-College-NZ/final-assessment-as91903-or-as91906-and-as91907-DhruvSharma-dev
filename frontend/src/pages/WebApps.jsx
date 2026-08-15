@@ -1,3 +1,6 @@
+// Directory of learning applications. Link labels and URLs are editable through the
+// Teacher Panel; icons are derived from each external domain and safe fallbacks are
+// used for missing or malformed URLs.
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import HighlightText from "../components/HighlightText";
@@ -18,11 +21,13 @@ function getLogoUrl(url) {
 
 function WebAppCard({ label, url, highlight }) {
   // This makes one card for a web app.
+  // Creating the logo URL here means each card gets the correct website icon.
   const logoUrl = getLogoUrl(url);
 
   return (
     <article className="flex min-h-56 flex-col justify-between rounded-lg border border-[#F2901D] bg-white p-4 shadow-sm">
       <div className="flex flex-1 items-center justify-center">
+        {/* object-contain stops wide or tall logos being stretched. */}
         <img
           src={logoUrl}
           alt={`${label} logo`}
@@ -35,6 +40,7 @@ function WebAppCard({ label, url, highlight }) {
           <HighlightText text={label} highlight={highlight} />
         </h2>
 
+        {/* Open apps in a new tab and protect the original StudentNET tab. */}
         <a
           href={url}
           target="_blank"
@@ -63,6 +69,7 @@ export default function WebApps() {
   return (
     <Layout>
       <section className="space-y-4">
+        {/* This heading explains the purpose of the page before the app cards. */}
         <div>
           <h1 className="text-3xl font-bold text-white">
             Web-Based App(s)

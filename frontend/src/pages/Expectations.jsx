@@ -1,3 +1,6 @@
+// School Expectations browser. Teacher-edited expectation objects are grouped into
+// categories for navigation; the page also handles an empty database gracefully and
+// highlights terms supplied by the global site search.
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import HighlightText from "../components/HighlightText";
@@ -11,7 +14,11 @@ export default function Expectations() {
   // Highlight the word searched in the navbar.
   const [searchParams] = useSearchParams();
   const highlight = searchParams.get("highlight") || "";
+
+  // Start with the browser copy so the page does not look empty while loading.
   const [norms, setNorms] = useState(() => getStoredNorms());
+
+  // An empty value means the first available category will be selected below.
   const [activeCategory, setActiveCategory] = useState("");
 
   useEffect(() => {
@@ -25,9 +32,11 @@ export default function Expectations() {
       .map((norm) => norm.category)
       .filter(Boolean);
 
+    // Set removes duplicates, then the spread changes it back into an array.
     return [...new Set(savedCategories)];
   }, [norms]);
 
+  // Use the clicked category, or safely fall back to the first saved category.
   const selectedCategory = activeCategory || categories[0] || "";
 
   const filteredNorms = useMemo(() => {
@@ -42,6 +51,7 @@ export default function Expectations() {
   return (
     <Layout>
       <section className="space-y-4 lg:h-[calc(100vh-13rem)] lg:overflow-hidden">
+        {/* Categories are on the left and their full information is on the right. */}
         <div className="grid grid-cols-1 gap-4 lg:h-full lg:grid-cols-[17rem_1fr] lg:overflow-hidden">
           <aside className="flex min-h-0 flex-col rounded-lg border border-[#F2901D] bg-white p-4">
             <h1 className="mb-4 text-xl font-bold text-gray-950">
@@ -50,6 +60,7 @@ export default function Expectations() {
 
             <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {categories.map((category) => (
+                // Each unique category becomes its own navigation button.
                 <button
                   key={category}
                   type="button"
@@ -72,6 +83,7 @@ export default function Expectations() {
             </h2>
 
             {filteredNorms.length ? (
+              // More than one expectation can belong to the same category.
               <div className="max-w-5xl space-y-5">
                 {filteredNorms.map((norm) => (
                   <section
@@ -93,6 +105,7 @@ export default function Expectations() {
                 ))}
               </div>
             ) : (
+              // Explain an empty database instead of showing a blank panel.
               <p className="text-gray-500">
                 Add expectations in the Teacher Panel to display school expectations here.
               </p>

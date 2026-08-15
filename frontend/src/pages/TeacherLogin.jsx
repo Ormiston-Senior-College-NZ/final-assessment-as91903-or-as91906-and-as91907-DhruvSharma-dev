@@ -1,3 +1,6 @@
+// Authentication form for the protected Teacher Panel. Credentials are sent only
+// to Flask, which checks the salted database hash and returns a signed session
+// cookie. React stores neither the submitted password nor teacher account records.
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/osc-logo.png";
@@ -5,22 +8,29 @@ import logo from "../assets/osc-logo.png";
 const apiBaseUrl = "http://localhost:5000";
 
 export default function TeacherLogin() {
-  // Form state for the teacher login fields and messages.
+  // useNavigate lets the page send a teacher to the panel after logging in.
   const navigate = useNavigate();
+
+  // These states keep track of what has been typed into the form.
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // The error starts empty and is only filled in when login does not work.
   const [errorMessage, setErrorMessage] = useState("");
+
+  // This stops the button being clicked many times while Flask is responding.
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event) {
-    // Send the teacher login details to Flask.
+    // Stop the form from refreshing the whole page when it is submitted.
     event.preventDefault();
-    // Clear old errors before trying a new login.
+
+    // Clear the previous error and change the button to "Logging in...".
     setErrorMessage("");
     setIsSubmitting(true);
 
     try {
-      // credentials: "include" lets Flask set/read the session cookie.
+      // Send the form as JSON. credentials includes the login session cookie.
       const response = await fetch(`${apiBaseUrl}/api/login`, {
         method: "POST",
         credentials: "include",
@@ -31,6 +41,7 @@ export default function TeacherLogin() {
       });
 
       if (!response.ok) {
+        // Flask returns a non-success status when the details are incorrect.
         throw new Error("Invalid email or password.");
       }
 
@@ -40,6 +51,7 @@ export default function TeacherLogin() {
       // Show a friendly message instead of crashing the page.
       setErrorMessage(error.message);
     } finally {
+      // finally runs after success or failure, so the button always resets.
       setIsSubmitting(false);
     }
   }
@@ -94,6 +106,7 @@ export default function TeacherLogin() {
           </div>
 
           <div className="space-y-4">
+            {/* Both inputs are controlled by React and must be completed. */}
             <input
               type="email"
               value={email}
@@ -123,16 +136,19 @@ export default function TeacherLogin() {
           )}
 
           <div className="mt-8 flex justify-center">
+            {/* Disable the button while waiting to prevent duplicate requests. */}
             <button
               type="submit"
               disabled={isSubmitting}
             className="w-full rounded-md bg-[#F2901D] px-8 py-3 text-sm font-semibold text-white transition hover:bg-[#d87d11] focus:outline-none focus:ring-2 focus:ring-[#F2901D] focus:ring-offset-2 sm:w-auto sm:px-18"
             >
+              {/* Give the teacher feedback while the request is running. */}
               {isSubmitting ? "Logging in..." : "Login ->"}
             </button>
           </div>
 
           <div className="mt-8 flex justify-center">
+            {/* The school logo makes it clear this is the OSC login page. */}
             <img
               src={logo}
               alt="Ormiston Senior College"
